@@ -25,6 +25,7 @@ urlpatterns += i18n_patterns(
     path('qr-generator/', include('apps.qr_generator.urls')),
     path('ppt-to-pdf/', include('apps.ppt_to_pdf.urls')),
     path('video-to-audio/', include('apps.video_to_audio.urls')),
+    path('youtube-downloader/', include('apps.youtube_downloader.urls')),
     path('password-generator/', include('apps.password_generator.urls')),
     path('text-diff/', include('apps.text_diff.urls')),
     path('lorem-ipsum/', include('apps.lorem_ipsum.urls')),

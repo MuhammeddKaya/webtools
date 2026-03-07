@@ -1,0 +1,81 @@
+{% extends 'base/layouts/main.html' %}
+{% load i18n %}
+
+{% block meta_title %}{% trans "YouTube Downloader (MP3 & MP4)" %} — WebTools{% endblock %}
+{% block meta_description %}{% trans "Download YouTube videos as MP3 audio or MP4 video quickly and easily." %}{% endblock %}
+
+{% block content %}
+<nav class="wt-breadcrumb" aria-label="Breadcrumb">
+    <a href="{% url 'home' %}">{% trans "Home" %}</a>
+    <span class="wt-breadcrumb__sep"><i class="bi bi-chevron-right"></i></span>
+    <span>{% trans "YouTube Downloader" %}</span>
+</nav>
+
+<div class="wt-panel" style="max-width:800px;margin:0 auto">
+    <div class="wt-panel__header">
+        <h1 class="wt-panel__title">
+            <i class="bi bi-youtube"
+               style="background:var(--accent-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent"></i>
+            {% trans "YouTube Downloader" %}
+        </h1>
+        <p class="wt-panel__subtitle">
+            {% trans "Paste a YouTube video URL and download it as MP3 audio or MP4 video." %}
+        </p>
+    </div>
+
+    {% if error %}
+    <div class="wt-alert wt-alert--error"><i class="bi bi-exclamation-circle"></i> {{ error }}</div>
+    {% endif %}
+
+    <form method="post" id="ytForm">
+        {% csrf_token %}
+
+        <div class="wt-field">
+            <label for="url" class="wt-label">{% trans "YouTube Video URL" %}</label>
+            <input type="url" name="url" id="url" class="wt-input"
+                   placeholder="https://www.youtube.com/watch?v=..."
+                   required>
+            <p class="wt-field__hint">
+                {% trans "Only public YouTube videos are supported. Please respect copyrights and terms of service when downloading content." %}
+            </p>
+        </div>
+
+        <div class="wt-field mt-md">
+            <span class="wt-label d-block mb-xs">{% trans "Format" %}</span>
+            <div class="wt-radio-group">
+                <label class="wt-radio">
+                    <input type="radio" name="format" value="mp3" checked>
+                    <span>{% trans "MP3 (audio only)" %}</span>
+                </label>
+                <label class="wt-radio">
+                    <input type="radio" name="format" value="mp4">
+                    <span>{% trans "MP4 (video)" %}</span>
+                </label>
+            </div>
+        </div>
+
+        <button type="submit" class="wt-btn wt-btn--primary wt-btn--block mt-lg" id="submitBtn">
+            <i class="bi bi-download"></i> {% trans "Download" %}
+        </button>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    (function () {
+        var form = document.getElementById('ytForm');
+        var submitBtn = document.getElementById('submitBtn');
+
+        form.addEventListener('submit', function () {
+            submitBtn.innerHTML = '<div class="wt-spinner wt-spinner--sm" style="margin-right:8px"></div> {% trans "Preparing download..." %}';
+            submitBtn.disabled = true;
+            setTimeout(function () {
+                submitBtn.innerHTML = '<i class="bi bi-download"></i> {% trans "Download" %}';
+                submitBtn.disabled = false;
+            }, 8000);
+        });
+    })();
+</script>
+{% endblock %}
+

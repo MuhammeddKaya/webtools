@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'apps.text_diff',
     'apps.lorem_ipsum',
     'apps.tool_manager',
+    'apps.youtube_downloader',
 ]
 
 MIDDLEWARE = [

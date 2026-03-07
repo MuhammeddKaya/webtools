@@ -13,3 +13,4 @@ pydub==0.25.1
 Babel==2.10.3
 onnxruntime==1.23.2
 opencv-python-headless==4.12.0.88
+yt-dlp==2026.3.3

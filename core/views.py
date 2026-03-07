@@ -18,16 +18,52 @@ def _get_default_tools():
         {'name': _('Audio to Text'), 'desc': _('Transcribe audio files to text in multiple languages'), 'id_name': 'audio_to_text:index', 'icon': 'bi-mic', 'category': 'other', 'order': 110},
         {'name': _('QR Generator'), 'desc': _('Generate customizable QR codes with colors'), 'id_name': 'qr_generator:index', 'icon': 'bi-qr-code', 'category': 'other', 'order': 120},
         {'name': _('Video to Audio'), 'desc': _('Extract MP3 audio from video files'), 'id_name': 'video_to_audio:index', 'icon': 'bi-file-earmark-music', 'category': 'other', 'order': 130},
+        {'name': _('YouTube Downloader'), 'desc': _('Download YouTube videos as MP3 or MP4'), 'id_name': 'youtube_downloader:index', 'icon': 'bi-youtube', 'category': 'other', 'order': 135},
         {'name': _('Password Generator'), 'desc': _('Generate secure random passwords'), 'id_name': 'password_generator:index', 'icon': 'bi-shield-lock', 'category': 'other', 'order': 140},
         {'name': _('Text Diff'), 'desc': _('Compare two texts and find differences'), 'id_name': 'text_diff:index', 'icon': 'bi-intersect', 'category': 'text', 'order': 150},
         {'name': _('Lorem Ipsum'), 'desc': _('Generate placeholder dummy text'), 'id_name': 'lorem_ipsum:index', 'icon': 'bi-text-paragraph', 'category': 'text', 'order': 160},
     ]
 
+def _sync_default_tools():
+    """
+    Ensure all default tools exist and keep basic fields updated.
+    Safe to run on every request.
+    """
+    for t in _get_default_tools():
+        obj, created = Tool.objects.get_or_create(
+            id_name=t["id_name"],
+            defaults={
+                "name": t["name"],
+                "desc": t["desc"],
+                "icon": t["icon"],
+                "category": t["category"],
+                "order": t["order"],
+            },
+        )
+        if not created:
+            changed = False
+            if obj.name != t["name"]:
+                obj.name = t["name"]
+                changed = True
+            if obj.desc != t["desc"]:
+                obj.desc = t["desc"]
+                changed = True
+            if obj.icon != t["icon"]:
+                obj.icon = t["icon"]
+                changed = True
+            if obj.category != t["category"]:
+                obj.category = t["category"]
+                changed = True
+            if obj.order != t["order"]:
+                obj.order = t["order"]
+                changed = True
+            if changed:
+                obj.save()
+
+
 def home(request):
-    if not Tool.objects.exists():
-        default_tools = _get_default_tools()
-        for t in default_tools:
-            Tool.objects.create(name=t['name'], desc=t['desc'], id_name=t['id_name'], icon=t['icon'], category=t['category'], order=t['order'])
+    # Her istekte eksik default tool'ları (örneğin yeni eklenen YouTube Downloader) senkronize et
+    _sync_default_tools()
 
     active_tools = Tool.objects.filter(is_active=True)
     tools = []
