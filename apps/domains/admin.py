@@ -70,9 +70,16 @@ server {{
                 with open(conf_path, 'w') as f:
                     f.write(config_content)
                 
-                # 3. Nginx'i yeniden başlat (Docker CLI kullanarak diğer konteynere sinyal gönder)
-                # Docker daemon /var/run/docker.sock üzerinden erişilebilir olmalı
-                subprocess.run(['docker', 'exec', 'webtools-nginx', 'nginx', '-s', 'reload'], check=False)
+                # 3. Nginx'i yeniden başlat (Docker API unix socket üzerinden)
+                try:
+                    import socket
+                    sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+                    sock.connect('/var/run/docker.sock')
+                    sock.sendall(b"POST /containers/webtools-nginx/kill?signal=SIGHUP HTTP/1.0\r\nHost: localhost\r\n\r\n")
+                    sock.recv(1024)
+                    sock.close()
+                except Exception as sock_err:
+                    messages.warning(request, f"Nginx otomatik yenilenirken hata: {sock_err}. Lütfen Docker üzerinden Nginx'i manuel yeniden başlatın.")
 
                 messages.success(request, f"{domain} için SSL başarıyla kuruldu ve Nginx yenilendi!")
             else:

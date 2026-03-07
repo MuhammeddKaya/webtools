@@ -37,6 +37,12 @@ class DeployLogAdmin(admin.ModelAdmin):
             log = DeployLog(triggered_by=request.user, status='running')
 
             try:
+                # Add safe directory exception for git in Docker
+                subprocess.run(
+                    ['git', 'config', '--global', '--add', 'safe.directory', repo_path],
+                    capture_output=True, text=True
+                )
+
                 # Get current commit
                 result_before = subprocess.run(
                     ['git', 'rev-parse', 'HEAD'],
