@@ -1,236 +1,85 @@
-# 🚀 WebTools — Sunucu Kurulum Kılavuzu
+# 🚀 WebTools — Sıfırdan Kurulum Kılavuzu (Docker Nginx + Admin SSL)
 
-## Gereksinimler (Sunucuda)
-
-- Ubuntu 22.04+ veya Debian 12+
-- Docker ve Docker Compose yüklü
-- Git yüklü
-- En az 2GB RAM
+Bu kılavuz, tertemiz (sıfırlanmış) bir Ubuntu sunucuya projenin nasıl kurulacağını ve tek tıkla SSL alınacağını anlatır.
 
 ---
 
-## 1. Sunucuya Docker Kurulumu
+## 1. Sunucu Hazırlığı ve Projeyi İndirme
+
+Sunucunuza SSH ile bağlanın ve şu komutları sırasıyla çalıştırın:
 
 ```bash
-# Docker kurulumu
+# Gerekli klasörü oluşturup içine girelim
+sudo mkdir -p /opt/webtools
+sudo chown -R $USER:$USER /opt/webtools
+cd /opt/webtools
+
+# Projeyi GitHub'dan indirelim
+git clone https://github.com/MuhammeddKaya/webtools.git .
+```
+
+Eğer sunucunuzda Docker yüklü değilse, tek komutla yükleyin:
+```bash
 curl -fsSL https://get.docker.com | sh
 sudo usermod -aG docker $USER
-# Oturumu kapatıp tekrar açın
-
-# Docker Compose (genelde Docker ile birlikte gelir)
-docker compose version
+# (Docker yüklendikten sonra komut satırından çıkıp tekrar SSH ile bağlanmanız gerekebilir)
 ```
 
 ---
 
-## 2. Projeyi Sunucuya Çekme
+## 2. Ortam Değişkenlerini (Ayarları) Yapılandırma
 
-```bash
-cd /opt
-sudo git clone https://github.com/KULLANICI/webtools.git
-cd webtools
-sudo chown -R $USER:$USER .
-```
-
----
-
-## 3. Ortam Değişkenlerini Ayarlama
+Projeyi çalıştırmadan önce güvenlik ayarlarını (şifreler vs.) belirlemeliyiz:
 
 ```bash
 cp .env.example .env
 nano .env
 ```
 
-**Değiştirilmesi GEREKEN değerler:**
-
+Açılan dosyada şu üç değeri kendi bilgilerinize göre doldurun:
 ```env
-# Güçlü bir secret key oluşturun:
-# python3 -c "import secrets; print(secrets.token_urlsafe(50))"
-DJANGO_SECRET_KEY=buraya-uzun-rastgele-key
+# Güçlü, rastgele bir şifre yazın
+DJANGO_SECRET_KEY=rastgele-uzun-sifre-yaz
 
-DJANGO_DEBUG=False
-DJANGO_ALLOWED_HOSTS=SUNUCU_IP_ADRESI,localhost
+# Buraya sadece ve sadece sunucunuzun IP aresini yazın! (Örn: 77.42.87.77)
+DJANGO_ALLOWED_HOSTS=SUNUCU_IP_ADRESI_BURAYA
 
-# Veritabanı şifresi
-DB_PASSWORD=guclu-bir-sifre-buraya
-
-# Deploy token (webhook için)
-GIT_DEPLOY_TOKEN=gizli-deploy-token
-
-# CSRF (alan adınız olunca ekleyin)
-# CSRF_TRUSTED_ORIGINS=https://webtools.com
+# Veritabanı şifreniz
+DB_PASSWORD=guclu-bir-sifre
 ```
+*Kaydetmek için: Ctrl+O, Enter, Ctrl+X*
 
 ---
 
-## 4. Docker ile Başlatma
+## 3. Sistemi Başlatma (İlk Kurulum)
+
+Tüm hizmetleri (Veritabanı, Django, Nginx) arka planda başlatalım:
 
 ```bash
-# İlk build ve başlatma
 docker compose up -d --build
-
-# Logları takip edin
-docker compose logs -f web
-
-# Superuser oluşturun (admin paneli için)
+```
+İşlem bittiğinde (hepsi `Started` olduğunda), admin paneline girebilmek için yönetici hesabınızı oluşturun:
+```bash
 docker compose exec web python manage.py createsuperuser
 ```
-
-**İlk başlatmada otomatik olarak:**
-- ✅ PostgreSQL veritabanı oluşturulacak
-- ✅ Django migration'ları çalışacak
-- ✅ Static dosyalar toplanacak
-- ✅ Çeviriler derlenecek
-- ✅ Gunicorn 3 worker ile başlatılacak
+(Kullanıcı adı, e-mail ve şifre belirleyin).
 
 ---
 
-## 5. Sunucuya Erişim
+## 4. Alan Adı Ekleme ve Otomatik SSL (Yeşil Kilit) Kurulumu
 
-Domain olmadan doğrudan IP ile erişebilirsiniz:
+Artık komut satırıyla işiniz bitti! 
 
-```
-http://SUNUCU_IP_ADRESI/           → Ana sayfa
-http://SUNUCU_IP_ADRESI/admin/     → Admin paneli
-```
+1. Tarayıcınızı açın ve sunucunuzun IP adresi üzerinden admin paneline girin:
+   👉 `http://SUNUCU_IP_ADRESI/admin/`
+2. Oluşturduğunuz superuser (yönetici) hesabıyla giriş yapın.
+3. Ana sayfada **Domain Settings -> Custom Domains** menüsüne tıklayın.
+4. Sağ üstten "ADD CUSTOM DOMAIN" butonuna tıklayıp sahip olduğunuz alan adını girin (Örn: `muhamedkaya.com.tr`).
+5. Kaydettikten sonra, listede o alan adının sol tarafındaki kutucuğu (checkbox) işaretleyin.
+6. Sol üstteki **Açılır Menüye (Action)** tıklayın ve listeden şunu seçin:
+   👉 **"Seçili Alan Adlarına SSL (Yeşil Kilit) Kur"**
+7. Hemen yanındaki **Go (Git)** butonuna basın!
 
----
+Sistem saniyeler içinde Let's Encrypt'e bağlanacak, sertifikaları çekecek, Nginx ayarlarını baştan yazacak ve Nginx'i otomatik olarak yeniden başlatacaktır. Ekrandaki yeşil başarı mesajını gördükten sonra, yeni bir sekmede `https://muhamedkaya.com.tr` yazarak sitenize giriş yapabilirsiniz! 🎉
 
-## 6. Admin Panelden Git Deploy
-
-Admin paneline giriş yapın (`/admin/`) ve:
-
-1. **Deploy > Deploy Logs** bölümüne gidin
-2. Üstteki yeşil **"⬇️ Deploy Now"** butonuna tıklayın
-3. Sistem otomatik olarak:
-   - `git pull origin main` çalıştırır
-   - `collectstatic` çalıştırır
-   - `migrate` çalıştırır
-   - Sonucu log olarak kaydeder
-
----
-
-## 7. GitHub Webhook ile Otomatik Deploy
-
-Git'e push yapınca otomatik deploy istiyorsanız:
-
-### GitHub'da Webhook Ayarı:
-
-1. GitHub repo → **Settings** → **Webhooks** → **Add webhook**
-2. **Payload URL:** `http://SUNUCU_IP/deploy/webhook/`
-3. **Content type:** `application/json`
-4. **Secret:** `.env` dosyasındaki `GIT_DEPLOY_TOKEN` değeri
-5. **Events:** sadece "Push" olayı
-
-Artık `main` branch'e push yapınca sunucu otomatik güncellenir!
-
-### Manuel test:
-```bash
-curl -X POST http://SUNUCU_IP/deploy/webhook/ \
-     -H "X-Deploy-Token: GIT_DEPLOY_TOKEN_DEGERI"
-```
-
----
-
-## 8. Alan Adı Ekleme (Sonrası İçin)
-
-Alan adınız olduğunda:
-
-### a) `.env` dosyasını güncelleyin:
-```env
-DJANGO_ALLOWED_HOSTS=webtools.com,www.webtools.com,SUNUCU_IP
-CSRF_TRUSTED_ORIGINS=https://webtools.com,https://www.webtools.com
-```
-
-### b) Nginx config'i güncelleyin:
-```bash
-nano nginx/default.conf
-```
-`server_name _;` satırını şu şekilde değiştirin:
-```nginx
-server_name webtools.com www.webtools.com;
-```
-
-### c) SSL (Let's Encrypt) ekleyin:
-```bash
-# Certbot kurulumu
-sudo apt install certbot python3-certbot-nginx
-
-# SSL sertifikası alın
-sudo certbot --nginx -d webtools.com -d www.webtools.com
-
-# Otomatik yenileme
-sudo crontab -e
-# Ekleyin: 0 3 * * * certbot renew --quiet
-```
-
-### d) Servisleri yeniden başlatın:
-```bash
-docker compose restart
-```
-
----
-
-## 9. Yararlı Komutlar
-
-```bash
-# Servisleri durdur
-docker compose down
-
-# Yeniden başlat
-docker compose restart
-
-# Logları gör
-docker compose logs -f web
-docker compose logs -f nginx
-docker compose logs -f db
-
-# Veritabanı yedeği
-docker compose exec db pg_dump -U webtools webtools > backup.sql
-
-# Yedeği geri yükle
-cat backup.sql | docker compose exec -T db psql -U webtools webtools
-
-# Django shell
-docker compose exec web python manage.py shell
-
-# Yeni superuser
-docker compose exec web python manage.py createsuperuser
-
-# Container'a giriş
-docker compose exec web bash
-```
-
----
-
-## 10. Proje Yapısı
-
-```
-webtools/
-├── docker-compose.yml     ← Docker servisleri
-├── Dockerfile             ← Python image build
-├── docker-entrypoint.sh   ← Başlangıç script'i
-├── .env                   ← Ortam değişkenleri (git'e ekleme!)
-├── .env.example           ← Örnek .env
-├── nginx/
-│   └── default.conf       ← Nginx reverse proxy config
-├── requirements.txt       ← Python bağımlılıkları
-├── apps/
-│   ├── ads/               ← Reklam yönetimi
-│   ├── deploy/            ← Git deploy sistemi
-│   └── ...                ← Diğer araçlar
-└── webtools/
-    └── settings.py        ← Django ayarları (env-based)
-```
-
----
-
-## Güvenlik Notları
-
-⚠️ **Yapılması gerekenler:**
-- [ ] `.env` dosyasındaki `DJANGO_SECRET_KEY` değerini değiştirin
-- [ ] `DB_PASSWORD` değerini güçlü bir şifre yapın
-- [ ] `GIT_DEPLOY_TOKEN` benzersiz bir token belirleyin
-- [ ] `DJANGO_DEBUG=False` olduğundan emin olun
-- [ ] `.env` dosyasını asla git'e pushlamayın
-- [ ] Firewall kurun (sadece 80, 443, 22 portları açık)
+> Not: Bu sistemi kullanabilmeniz için alan adınızın (DNS) A kayıtlarının sunucunuzun IP adresine en az 1-2 saat önceden yönlendirilmiş olması gerekmektedir, aksi halde Let's Encrypt hata verir.
