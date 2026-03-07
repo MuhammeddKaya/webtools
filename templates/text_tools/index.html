@@ -1,0 +1,88 @@
+{% extends 'base/layouts/main.html' %}
+{% load i18n static %}
+
+{% block meta_title %}{% trans "Text Tools" %} — WebTools{% endblock %}
+{% block meta_description %}{% trans "Format JSON, convert text case, encode/decode Base64 & URL, generate hashes. Free online text manipulation tools." %}{% endblock %}
+
+{% block content %}
+<nav class="wt-breadcrumb" aria-label="Breadcrumb">
+    <a href="{% url 'home' %}">{% trans "Home" %}</a>
+    <span class="wt-breadcrumb__sep"><i class="bi bi-chevron-right"></i></span>
+    <span>{% trans "Text Tools" %}</span>
+</nav>
+
+<div class="wt-panel" style="max-width:900px;margin:0 auto">
+    <div class="wt-panel__header">
+        <h1 class="wt-panel__title"><i class="bi bi-code-slash"
+                style="background:var(--accent-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent"></i>
+            {% trans "Text Tools" %}</h1>
+        <p class="wt-panel__subtitle">{% trans "Format, convert, encode and hash your text." %}</p>
+    </div>
+
+    <form method="post" id="textForm">
+        {% csrf_token %}
+
+        <div class="wt-form-group">
+            <label class="wt-label" for="textInput">{% trans "Input Text" %}</label>
+            <textarea name="text" class="wt-textarea" id="textInput" rows="6"
+                placeholder="{% trans 'Paste your text here...' %}">{{ input_text }}</textarea>
+        </div>
+
+        {# Action Buttons Grid #}
+        <div class="wt-form-group">
+            <label class="wt-label">{% trans "Choose Action" %}</label>
+            <div class="wt-action-grid" id="actionGrid">
+                <button type="submit" name="action" value="json"
+                    class="wt-action-btn {% if action == 'json' %}active{% endif %}">JSON Format</button>
+                <button type="submit" name="action" value="upper"
+                    class="wt-action-btn {% if action == 'upper' %}active{% endif %}">UPPERCASE</button>
+                <button type="submit" name="action" value="lower"
+                    class="wt-action-btn {% if action == 'lower' %}active{% endif %}">lowercase</button>
+                <button type="submit" name="action" value="title"
+                    class="wt-action-btn {% if action == 'title' %}active{% endif %}">Title Case</button>
+                <button type="submit" name="action" value="capitalize"
+                    class="wt-action-btn {% if action == 'capitalize' %}active{% endif %}">Capitalize</button>
+                <button type="submit" name="action" value="camelCase"
+                    class="wt-action-btn {% if action == 'camelCase' %}active{% endif %}">camelCase</button>
+                <button type="submit" name="action" value="snake_case"
+                    class="wt-action-btn {% if action == 'snake_case' %}active{% endif %}">snake_case</button>
+                <button type="submit" name="action" value="kebab-case"
+                    class="wt-action-btn {% if action == 'kebab-case' %}active{% endif %}">kebab-case</button>
+                <button type="submit" name="action" value="slug"
+                    class="wt-action-btn {% if action == 'slug' %}active{% endif %}">URL Slug</button>
+                <button type="submit" name="action" value="reverse"
+                    class="wt-action-btn {% if action == 'reverse' %}active{% endif %}">{% trans "Reverse" %}</button>
+                <button type="submit" name="action" value="base64_encode"
+                    class="wt-action-btn {% if action == 'base64_encode' %}active{% endif %}">Base64 Encode</button>
+                <button type="submit" name="action" value="base64_decode"
+                    class="wt-action-btn {% if action == 'base64_decode' %}active{% endif %}">Base64 Decode</button>
+                <button type="submit" name="action" value="url_encode"
+                    class="wt-action-btn {% if action == 'url_encode' %}active{% endif %}">URL Encode</button>
+                <button type="submit" name="action" value="url_decode"
+                    class="wt-action-btn {% if action == 'url_decode' %}active{% endif %}">URL Decode</button>
+                <button type="submit" name="action" value="html_encode"
+                    class="wt-action-btn {% if action == 'html_encode' %}active{% endif %}">HTML Encode</button>
+                <button type="submit" name="action" value="html_decode"
+                    class="wt-action-btn {% if action == 'html_decode' %}active{% endif %}">HTML Decode</button>
+                <button type="submit" name="action" value="md5"
+                    class="wt-action-btn {% if action == 'md5' %}active{% endif %}">MD5 Hash</button>
+                <button type="submit" name="action" value="sha256"
+                    class="wt-action-btn {% if action == 'sha256' %}active{% endif %}">SHA256 Hash</button>
+            </div>
+        </div>
+    </form>
+
+    {% if result %}
+    <div class="wt-result">
+        <div class="wt-result__header">
+            <span class="wt-result__title">{% trans "Result" %}</span>
+            <button type="button" class="wt-btn wt-btn--secondary wt-btn--sm"
+                onclick="copyToClipboard(document.getElementById('resultText').value)">
+                <i class="bi bi-clipboard"></i> {% trans "Copy" %}
+            </button>
+        </div>
+        <textarea class="wt-textarea" id="resultText" rows="6" readonly>{{ result }}</textarea>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

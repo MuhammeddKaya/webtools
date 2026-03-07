@@ -1,0 +1,121 @@
+{% extends 'base/layouts/main.html' %}
+{% load i18n static %}
+
+{% block meta_title %}{% trans "Word Counter" %} — WebTools{% endblock %}
+{% block meta_description %}{% trans "Count words, characters, sentences, paragraphs and estimate reading time. Real-time text analysis. Free online tool." %}{% endblock %}
+
+{% block content %}
+<nav class="wt-breadcrumb" aria-label="Breadcrumb">
+    <a href="{% url 'home' %}">{% trans "Home" %}</a>
+    <span class="wt-breadcrumb__sep"><i class="bi bi-chevron-right"></i></span>
+    <span>{% trans "Word Counter" %}</span>
+</nav>
+
+<div class="wt-panel" style="max-width:900px;margin:0 auto">
+    <div class="wt-panel__header">
+        <h1 class="wt-panel__title"><i class="bi bi-bar-chart-line"
+                style="background:var(--accent-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent"></i>
+            {% trans "Word & Character Counter" %}</h1>
+        <p class="wt-panel__subtitle">{% trans "Type or paste text below — stats update in real time." %}</p>
+    </div>
+
+    {# Stats Cards #}
+    <div class="wt-stats" id="statsGrid">
+        <div class="wt-stat">
+            <div class="wt-stat__value" id="statWords">0</div>
+            <div class="wt-stat__label">{% trans "Words" %}</div>
+        </div>
+        <div class="wt-stat">
+            <div class="wt-stat__value" id="statChars">0</div>
+            <div class="wt-stat__label">{% trans "Characters" %}</div>
+        </div>
+        <div class="wt-stat">
+            <div class="wt-stat__value" id="statCharsNoSpace">0</div>
+            <div class="wt-stat__label">{% trans "No Spaces" %}</div>
+        </div>
+        <div class="wt-stat">
+            <div class="wt-stat__value" id="statSentences">0</div>
+            <div class="wt-stat__label">{% trans "Sentences" %}</div>
+        </div>
+        <div class="wt-stat">
+            <div class="wt-stat__value" id="statParagraphs">0</div>
+            <div class="wt-stat__label">{% trans "Paragraphs" %}</div>
+        </div>
+        <div class="wt-stat">
+            <div class="wt-stat__value" id="statReadTime">0m</div>
+            <div class="wt-stat__label">{% trans "Read Time" %}</div>
+        </div>
+    </div>
+
+    <div class="wt-form-group mt-xl">
+        <textarea class="wt-textarea" id="textInput" rows="12"
+            placeholder="{% trans 'Start typing or paste your text here...' %}" autofocus>{{ input_text }}</textarea>
+    </div>
+
+    {# Top Words #}
+    <div id="topWordsSection" class="hidden mt-lg">
+        <div class="wt-result">
+            <div class="wt-result__header">
+                <span class="wt-result__title">{% trans "Most Used Words" %}</span>
+            </div>
+            <div id="topWords" class="wt-action-grid"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    (function () {
+        const input = document.getElementById('textInput');
+        const els = {
+            words: document.getElementById('statWords'),
+            chars: document.getElementById('statChars'),
+            charsNoSpace: document.getElementById('statCharsNoSpace'),
+            sentences: document.getElementById('statSentences'),
+            paragraphs: document.getElementById('statParagraphs'),
+            readTime: document.getElementById('statReadTime'),
+        };
+        const topWordsSection = document.getElementById('topWordsSection');
+        const topWordsEl = document.getElementById('topWords');
+
+        function analyze() {
+            const text = input.value;
+            const words = text.trim() ? text.trim().split(/\s+/) : [];
+            const sentences = text.trim() ? text.split(/[.!?]+/).filter(s => s.trim()).length : 0;
+            const paragraphs = text.trim() ? text.split(/\n\s*\n/).filter(p => p.trim()).length : 0;
+            const readMin = Math.max(1, Math.ceil(words.length / 200));
+
+            els.words.textContent = words.length;
+            els.chars.textContent = text.length;
+            els.charsNoSpace.textContent = text.replace(/\s/g, '').length;
+            els.sentences.textContent = sentences;
+            els.paragraphs.textContent = paragraphs || (text.trim() ? 1 : 0);
+            els.readTime.textContent = words.length ? readMin + 'm' : '0m';
+
+            // Top words
+            if (words.length >= 3) {
+                const freq = {};
+                words.forEach(w => {
+                    const lw = w.toLowerCase().replace(/[^a-zA-ZçğıöşüÇĞİÖŞÜ0-9]/g, '');
+                    if (lw.length > 2) freq[lw] = (freq[lw] || 0) + 1;
+                });
+                const sorted = Object.entries(freq).sort((a, b) => b[1] - a[1]).slice(0, 10);
+                if (sorted.length) {
+                    topWordsSection.classList.remove('hidden');
+                    topWordsEl.innerHTML = sorted.map(([w, c]) =>
+                        `<span class="wt-action-btn" style="cursor:default">${w} <strong>(${c})</strong></span>`
+                    ).join('');
+                } else {
+                    topWordsSection.classList.add('hidden');
+                }
+            } else {
+                topWordsSection.classList.add('hidden');
+            }
+        }
+
+        input.addEventListener('input', analyze);
+        analyze(); // initial
+    })();
+</script>
+{% endblock %}

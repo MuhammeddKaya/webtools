@@ -1,0 +1,99 @@
+{% extends 'base/layouts/main.html' %}
+{% load i18n static %}
+
+{% block meta_title %}{% trans "Background Remover" %} — WebTools{% endblock %}
+{% block meta_description %}{% trans "Remove background from any image using AI. Download as PNG with transparent background. Free online tool." %}{% endblock %}
+
+{% block content %}
+<nav class="wt-breadcrumb" aria-label="Breadcrumb">
+    <a href="{% url 'home' %}">{% trans "Home" %}</a>
+    <span class="wt-breadcrumb__sep"><i class="bi bi-chevron-right"></i></span>
+    <span>{% trans "Background Remover" %}</span>
+</nav>
+
+<div class="wt-panel" style="max-width:800px;margin:0 auto">
+    <div class="wt-panel__header">
+        <h1 class="wt-panel__title"><i class="bi bi-eraser"
+                style="background:var(--accent-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent"></i>
+            {% trans "Background Remover" %}</h1>
+        <p class="wt-panel__subtitle">{% trans "Upload an image and instantly remove its background using AI." %}</p>
+    </div>
+
+    {% if error %}
+    <div class="wt-alert wt-alert--error"><i class="bi bi-exclamation-circle"></i> {{ error }}</div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" id="bgForm">
+        {% csrf_token %}
+
+        <div class="wt-dropzone" id="dropzone">
+            <div class="wt-dropzone__icon"><i class="bi bi-image"></i></div>
+            <p class="wt-dropzone__text"><strong>{% trans "Click or drag" %}</strong> {% trans "to upload an image" %}
+            </p>
+            <p class="wt-dropzone__hint">JPG, PNG, WEBP • {% trans "Max 10MB" %}</p>
+            <input type="file" name="image_file" accept="image/jpeg,image/png,image/webp" required id="imgInput">
+        </div>
+
+        {# Image Preview #}
+        <div id="preview" class="hidden mt-lg">
+            <div class="wt-preview-compare">
+                <div class="wt-preview-compare__side">
+                    <p class="wt-preview-compare__label">{% trans "Original" %}</p>
+                    <img id="previewOriginal" src="" alt="Original">
+                </div>
+                <div class="wt-preview-compare__side" id="resultSide" style="display:none">
+                    <p class="wt-preview-compare__label">{% trans "Result" %}</p>
+                    <img id="previewResult" src="" alt="Result"
+                        style="background:repeating-conic-gradient(#808080 0% 25%, transparent 0% 50%) 50%/16px 16px">
+                </div>
+            </div>
+        </div>
+
+        <div class="wt-form-group mt-lg">
+            <label class="wt-label" for="outputFormat">{% trans "Output Format" %}</label>
+            <select name="output_format" class="wt-select" id="outputFormat">
+                <option value="png" selected>PNG ({% trans "Transparent" %})</option>
+                <option value="jpg">JPG ({% trans "White Background" %})</option>
+                <option value="webp">WEBP ({% trans "Transparent" %})</option>
+            </select>
+        </div>
+
+        <button type="submit" class="wt-btn wt-btn--primary wt-btn--block mt-lg" id="submitBtn" disabled>
+            <i class="bi bi-eraser"></i> {% trans "Remove Background" %}
+        </button>
+
+        <p class="text-muted text-center mt-md" style="font-size:var(--fs-xs)">
+            <i class="bi bi-info-circle"></i> {% trans "Processing may take a few seconds for large images." %}
+        </p>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    (function () {
+        const dropzone = document.getElementById('dropzone');
+        const imgInput = document.getElementById('imgInput');
+        const preview = document.getElementById('preview');
+        const previewOriginal = document.getElementById('previewOriginal');
+        const submitBtn = document.getElementById('submitBtn');
+
+        new DragDropUpload(dropzone, {
+            accept: 'image/*',
+            maxSize: 10 * 1024 * 1024,
+            onFilesAdded(files) {
+                if (files.length) {
+                    const dt = new DataTransfer();
+                    dt.items.add(files[0]);
+                    imgInput.files = dt.files;
+                    // Show original preview
+                    const url = URL.createObjectURL(files[0]);
+                    previewOriginal.src = url;
+                    preview.classList.remove('hidden');
+                    submitBtn.disabled = false;
+                }
+            }
+        });
+    })();
+</script>
+{% endblock %}

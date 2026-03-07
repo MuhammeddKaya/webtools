@@ -1,0 +1,547 @@
+# Turkish translations for WebTools
+msgid ""
+msgstr ""
+"Project-Id-Version: 1.0\n"
+"Language: tr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+# Navigation
+msgid "Home"
+msgstr "Giriş"
+
+msgid "Language"
+msgstr "Dil"
+
+msgid "Main navigation"
+msgstr "Ana navigasyon"
+
+msgid "Toggle menu"
+msgstr "Menüyü aç/kapat"
+
+msgid "Tool links"
+msgstr "Araç bağlantıları"
+
+msgid "Free online tools for everyone."
+msgstr "Herkes için ücretsiz çevrimiçi araçlar."
+
+# Homepage
+msgid "Your Online Toolbox"
+msgstr "Çevrimiçi Araç Kutunuz"
+
+msgid "Free, fast and private tools for PDF, image, text and more. No signup required."
+msgstr "PDF, görsel, metin ve daha fazlası için ücretsiz, hızlı ve gizlilik dostu araçlar. Kayıt gerekmez."
+
+msgid "Search tools..."
+msgstr "Araç ara..."
+
+msgid "Search tools"
+msgstr "Araç ara"
+
+msgid "Tool categories"
+msgstr "Araç kategorileri"
+
+msgid "All Tools"
+msgstr "Tüm Araçlar"
+
+msgid "Image"
+msgstr "Resim"
+
+msgid "Text"
+msgstr "Metin"
+
+msgid "Other"
+msgstr "Diğer"
+
+msgid "No tools found matching your search."
+msgstr "Aramanızla eşleşen araç bulunamadı."
+
+msgid "Open Tool"
+msgstr "Aracı Aç"
+
+msgid "Free Online PDF, Image & Text Tools"
+msgstr "Ücretsiz Çevrimiçi PDF, Görsel ve Metin Araçları"
+
+msgid "Free online tools: split and merge PDFs, remove backgrounds, resize images, generate QR codes, format text and more. No signup required."
+msgstr "Ücretsiz çevrimiçi araçlar: PDF'leri ayır ve birleştir, arka planları kaldır, görselleri boyutlandır, QR kodları oluştur, metin biçimlendir ve daha fazlası. Kayıt gerekmez."
+
+# Tool names
+msgid "PDF Split"
+msgstr "PDF Ayır"
+
+msgid "PDF Merge"
+msgstr "PDF Birleştir"
+
+msgid "PDF to Image"
+msgstr "PDF'den Görsele"
+
+msgid "Image to PDF"
+msgstr "Görsel'den PDF'e"
+
+msgid "PPT to PDF"
+msgstr "PPT'den PDF'e"
+
+msgid "Background Remover"
+msgstr "Arka Plan Kaldırıcı"
+
+msgid "Image Resize"
+msgstr "Görsel Boyutlandır"
+
+msgid "Text Tools"
+msgstr "Metin Araçları"
+
+msgid "Text Cleaner"
+msgstr "Metin Temizleyici"
+
+msgid "Word Counter"
+msgstr "Kelime Sayacı"
+
+msgid "QR Generator"
+msgstr "QR Oluşturucu"
+
+msgid "Audio to Text"
+msgstr "Ses'ten Metne"
+
+# Tool descriptions (updated)
+msgid "Split PDF files into individual pages or custom ranges"
+msgstr "PDF dosyalarını tek tek sayfalara veya özel aralıklara ayırın"
+
+msgid "Combine multiple PDF files into a single document"
+msgstr "Birden fazla PDF dosyasını tek bir belgede birleştirin"
+
+msgid "Convert PDF pages to JPG, PNG or WEBP images"
+msgstr "PDF sayfalarını JPG, PNG veya WEBP görsellere dönüştürün"
+
+msgid "Convert and merge images into a PDF document"
+msgstr "Görselleri PDF belgesine dönüştürün ve birleştirin"
+
+msgid "Convert PowerPoint presentations to PDF"
+msgstr "PowerPoint sunumlarını PDF'e dönüştürün"
+
+msgid "Remove background from any image with AI"
+msgstr "Yapay zeka ile herhangi bir görselden arka planı kaldırın"
+
+msgid "Resize images with presets or custom dimensions"
+msgstr "Görselleri hazır boyutlar veya özel ölçülerle boyutlandırın"
+
+msgid "Format JSON, convert case, encode/decode and hash text"
+msgstr "JSON biçimlendir, büyük/küçük harf dönüştür, kodla/çöz ve metin özetle"
+
+msgid "Clean up text by removing extra spaces, blank lines and more"
+msgstr "Fazla boşlukları, boş satırları ve daha fazlasını kaldırarak metni temizleyin"
+
+msgid "Count words, characters, sentences and estimate reading time"
+msgstr "Kelimeleri, karakterleri, cümleleri sayın ve okuma süresini tahmin edin"
+
+msgid "Generate custom QR codes with colors and download as PNG or SVG"
+msgstr "Renkli özel QR kodları oluşturun, PNG veya SVG olarak indirin"
+
+msgid "Transcribe audio files to text in 12 languages"
+msgstr "Ses dosyalarını 12 dilde metne çevirin"
+
+# Common
+msgid "Click or drag"
+msgstr "Tıklayın veya sürükleyin"
+
+msgid "Copy"
+msgstr "Kopyala"
+
+msgid "Download"
+msgstr "İndir"
+
+msgid "Close"
+msgstr "Kapat"
+
+msgid "Submit"
+msgstr "Gönder"
+
+msgid "Cancel"
+msgstr "İptal"
+
+# PDF Split
+msgid "Split PDF files into individual pages or extract specific page ranges. Free online tool."
+msgstr "PDF dosyalarını tek tek sayfalara ayırın veya belirli sayfa aralıklarını çıkarın. Ücretsiz çevrimiçi araç."
+
+msgid "to upload a PDF file"
+msgstr "PDF dosyası yüklemek için"
+
+msgid "Select pages to extract"
+msgstr "Çıkarılacak sayfaları seçin"
+
+msgid "Select All"
+msgstr "Tümünü Seç"
+
+msgid "Deselect All"
+msgstr "Seçimi Kaldır"
+
+msgid "Pages to Extract"
+msgstr "Çıkarılacak Sayfalar"
+
+msgid "e.g., 1,3-5,8"
+msgstr "örn: 1,3-5,8"
+
+msgid "Extract Pages"
+msgstr "Sayfaları Çıkar"
+
+msgid "selected"
+msgstr "seçili"
+
+msgid "pages"
+msgstr "sayfa"
+
+# PDF Merge
+msgid "Combine multiple PDF files into one document. Drag and drop to reorder. Free online tool."
+msgstr "Birden fazla PDF dosyasını tek bir belgede birleştirin. Sıralamak için sürükleyip bırakın. Ücretsiz çevrimiçi araç."
+
+msgid "to upload PDF files"
+msgstr "PDF dosyaları yüklemek için"
+
+msgid "Add at least 2 PDF files"
+msgstr "En az 2 PDF dosyası ekleyin"
+
+msgid "Merge PDFs"
+msgstr "PDF'leri Birleştir"
+
+# PDF to Image
+msgid "Convert PDF pages to high-quality JPG, PNG or WEBP images. Choose DPI and specific pages. Free online tool."
+msgstr "PDF sayfalarını yüksek kaliteli JPG, PNG veya WEBP görsellere dönüştürün. DPI ve sayfa seçimi yapın. Ücretsiz çevrimiçi araç."
+
+msgid "to upload a PDF"
+msgstr "PDF yüklemek için"
+
+msgid "Output Format"
+msgstr "Çıktı Formatı"
+
+msgid "Quality (DPI)"
+msgstr "Kalite (DPI)"
+
+msgid "Pages"
+msgstr "Sayfalar"
+
+msgid "All pages"
+msgstr "Tüm sayfalar"
+
+msgid "Convert"
+msgstr "Dönüştür"
+
+#  Image to PDF
+msgid "Convert and merge multiple images into a single PDF document. Drag to reorder pages. Free online tool."
+msgstr "Birden fazla görseli tek bir PDF belgesine dönüştürün ve birleştirin. Sayfaları sıralamak için sürükleyin. Ücretsiz çevrimiçi araç."
+
+msgid "to upload images"
+msgstr "görsel yüklemek için"
+
+msgid "JPG, PNG, WEBP"
+msgstr "JPG, PNG, WEBP"
+
+msgid "Page Size"
+msgstr "Sayfa Boyutu"
+
+msgid "Original"
+msgstr "Orijinal"
+
+msgid "Orientation"
+msgstr "Yönlendirme"
+
+msgid "Portrait"
+msgstr "Dikey"
+
+msgid "Landscape"
+msgstr "Yatay"
+
+msgid "Convert to PDF"
+msgstr "PDF'e Dönüştür"
+
+# Background Remover
+msgid "Remove background from any image using AI. Download as PNG with transparent background. Free online tool."
+msgstr "Yapay zeka ile herhangi bir görselden arka planı kaldırın. Şeffaf arka planlı PNG olarak indirin. Ücretsiz çevrimiçi araç."
+
+msgid "to upload an image"
+msgstr "görsel yüklemek için"
+
+msgid "Max 10MB"
+msgstr "Maks 10MB"
+
+msgid "Remove Background"
+msgstr "Arka Planı Kaldır"
+
+msgid "Before"
+msgstr "Önce"
+
+msgid "After"
+msgstr "Sonra"
+
+# Image Resize
+msgid "Resize images to any dimension. Use presets for social media (Instagram, Twitter, Facebook, YouTube). Free online tool."
+msgstr "Görselleri herhangi bir boyuta yeniden boyutlandırın. Sosyal medya (Instagram, Twitter, Facebook, YouTube) için hazır boyutlar. Ücretsiz çevrimiçi araç."
+
+msgid "Quick Presets"
+msgstr "Hazır Boyutlar"
+
+msgid "Lock Aspect Ratio"
+msgstr "En-Boy Oranını Kilitle"
+
+msgid "Resize"
+msgstr "Boyutlandır"
+
+msgid "Width"
+msgstr "Genişlik"
+
+msgid "Height"
+msgstr "Yükseklik"
+
+# Text Tools
+msgid "Format JSON, convert text case, encode/decode Base64 & URL, generate hashes. Free online tool."
+msgstr "JSON biçimlendir, metin büyük/küçük harf dönüştür, Base64 ve URL kodla/çöz, hash oluştur. Ücretsiz çevrimiçi araç."
+
+msgid "Choose an action and enter your text."
+msgstr "Bir işlem seçin ve metninizi girin."
+
+msgid "Input Text"
+msgstr "Giriş Metni"
+
+msgid "Enter text here..."
+msgstr "Metni buraya girin..."
+
+msgid "Format JSON"
+msgstr "JSON Formatla"
+
+msgid "Uppercase"
+msgstr "BÜYÜK HARF"
+
+msgid "Lowercase"
+msgstr "küçük harf"
+
+msgid "Title Case"
+msgstr "Başlık Şekli"
+
+msgid "Capitalize"
+msgstr "İlk Harf Büyük"
+
+msgid "camelCase"
+msgstr "camelCase"
+
+msgid "snake_case"
+msgstr "snake_case"
+
+msgid "kebab-case"
+msgstr "kebab-case"
+
+msgid "Slug"
+msgstr "Slug"
+
+msgid "Reverse"
+msgstr "Tersine Çevir"
+
+msgid "Base64 Encode"
+msgstr "Base64 Kodla"
+
+msgid "Base64 Decode"
+msgstr "Base64 Çöz"
+
+msgid "URL Encode"
+msgstr "URL Kodla"
+
+msgid "URL Decode"
+msgstr "URL Çöz"
+
+msgid "HTML Encode"
+msgstr "HTML Kodla"
+
+msgid "HTML Decode"
+msgstr "HTML Çöz"
+
+msgid "Result"
+msgstr "Sonuç"
+
+# Text Cleaner
+msgid "Clean up text by removing extra spaces, blank lines, HTML tags and special characters. Free online tool."
+msgstr "Fazla boşlukları, boş satırları, HTML etiketlerini ve özel karakterleri kaldırarak metni temizleyin. Ücretsiz çevrimiçi araç."
+
+msgid "Choose cleaning options and paste your messy text."
+msgstr "Temizleme seçeneklerini seçin ve düzensiz metninizi yapıştırın."
+
+msgid "Cleaning Options"
+msgstr "Temizleme Seçenekleri"
+
+msgid "Remove extra spaces"
+msgstr "Fazla boşlukları kaldır"
+
+msgid "Remove empty lines"
+msgstr "Boş satırları kaldır"
+
+msgid "Trim line edges"
+msgstr "Satır kenarlarını kırp"
+
+msgid "Tabs → Spaces"
+msgstr "Sekme → Boşluk"
+
+msgid "Merge duplicate blank lines"
+msgstr "Tekrarlanan boş satırları birleştir"
+
+msgid "Strip HTML tags"
+msgstr "HTML etiketlerini kaldır"
+
+msgid "Remove special characters"
+msgstr "Özel karakterleri kaldır"
+
+msgid "Paste your text here..."
+msgstr "Metninizi buraya yapıştırın..."
+
+msgid "Clean Text"
+msgstr "Metni Temizle"
+
+msgid "Cleaned Result"
+msgstr "Temizlenmiş Sonuç"
+
+# Word Counter
+msgid "Count words, characters, sentences, paragraphs and estimate reading time. Real-time analysis. Free online tool."
+msgstr "Kelimeleri, karakterleri, cümleleri, paragrafları sayın ve okuma süresini tahmin edin. Gerçek zamanlı analiz. Ücretsiz çevrimiçi araç."
+
+msgid "Word & Character Counter"
+msgstr "Kelime ve Karakter Sayacı"
+
+msgid "Type or paste text below — stats update in real time."
+msgstr "Aşağıya metin yazın veya yapıştırın — istatistikler gerçek zamanlı güncellenir."
+
+msgid "Start typing or paste your text here..."
+msgstr "Yazmaya başlayın veya metninizi buraya yapıştırın..."
+
+msgid "Most Used Words"
+msgstr "En Çok Kullanılan Kelimeler"
+
+# QR Generator
+msgid "QR Code Generator"
+msgstr "QR Kod Oluşturucu"
+
+msgid "Generate custom QR codes with colors, sizes and error correction levels. Download as PNG or SVG. Free online tool."
+msgstr "Renklerle, boyutlarla ve hata düzeltme seviyeleriyle özel QR kodları oluşturun. PNG veya SVG olarak indirin. Ücretsiz çevrimiçi araç."
+
+msgid "Enter text or URL, customize colors, and generate your QR code."
+msgstr "Metin veya URL girin, renkleri özelleştirin ve QR kodunuzu oluşturun."
+
+msgid "Text or URL"
+msgstr "Metin veya URL"
+
+msgid "Enter text or URL to generate QR code"
+msgstr "QR kod oluşturmak için metin veya URL girin"
+
+msgid "Foreground Color"
+msgstr "Ön Plan Rengi"
+
+msgid "Background Color"
+msgstr "Arka Plan Rengi"
+
+msgid "Size"
+msgstr "Boyut"
+
+msgid "Small"
+msgstr "Küçük"
+
+msgid "Medium"
+msgstr "Orta"
+
+msgid "Large"
+msgstr "Büyük"
+
+msgid "Extra Large"
+msgstr "Çok Büyük"
+
+msgid "Error Correction"
+msgstr "Hata Düzeltme"
+
+msgid "Generate QR Code"
+msgstr "QR Kod Oluştur"
+
+# Audio to Text
+msgid "Transcribe audio files to text. Supports WAV, MP3, M4A, OGG, FLAC in 12 languages. Free online tool."
+msgstr "Ses dosyalarını metne çevirin. WAV, MP3, M4A, OGG, FLAC formatlarını 12 dilde destekler. Ücretsiz çevrimiçi araç."
+
+msgid "Upload an audio file and transcribe it to text using Google Speech Recognition."
+msgstr "Bir ses dosyası yükleyin ve Google Ses Tanıma kullanarak metne çevirin."
+
+msgid "to upload an audio file"
+msgstr "ses dosyası yüklemek için"
+
+msgid "Max 25MB"
+msgstr "Maks 25MB"
+
+msgid "Transcribe"
+msgstr "Metne Çevir"
+
+msgid "Processing may take a while for long audio files."
+msgstr "Uzun ses dosyaları için işlem biraz zaman alabilir."
+
+msgid "Transcription"
+msgstr "Transkripsiyon"
+
+# PPT to PDF
+msgid "Convert PowerPoint presentations to PDF format. Free online converter."
+msgstr "PowerPoint sunumlarını PDF formatına dönüştürün. Ücretsiz çevrimiçi dönüştürücü."
+
+msgid "to upload a PowerPoint file"
+msgstr "PowerPoint dosyası yüklemek için"
+
+msgid "PPTX, PPT"
+msgstr "PPTX, PPT"
+
+# BG Remover alias
+msgid "BG Remover"
+msgstr "Arka Plan Kaldır"
+
+# Ad system
+msgid "Sidebar Left"
+msgstr "Sol Kenar Çubuğu"
+
+msgid "Sidebar Right"
+msgstr "Sağ Kenar Çubuğu"
+
+msgid "Header Banner"
+msgstr "Üst Banner"
+
+msgid "Footer Banner"
+msgstr "Alt Banner"
+
+msgid "In Content"
+msgstr "İçerik İçi"
+
+msgid "All Pages"
+msgstr "Tüm Sayfalar"
+
+msgid "Home Page Only"
+msgstr "Sadece Ana Sayfa"
+
+msgid "Tool Pages Only"
+msgstr "Sadece Araç Sayfaları"
+
+msgid "Ad Name"
+msgstr "Reklam Adı"
+
+msgid "Position"
+msgstr "Konum"
+
+msgid "Show On"
+msgstr "Göster"
+
+msgid "Ad Code (HTML)"
+msgstr "Reklam Kodu (HTML)"
+
+msgid "Paste your Google AdSense or ad network HTML code here."
+msgstr "Google AdSense veya reklam ağı HTML kodunuzu buraya yapıştırın."
+
+msgid "Active"
+msgstr "Aktif"
+
+msgid "Display Order"
+msgstr "Görüntüleme Sırası"
+
+msgid "Ad Placement"
+msgstr "Reklam Yerleşimi"
+
+msgid "Ad Placements"
+msgstr "Reklam Yerleşimleri"
+
+msgid "Advertisements"
+msgstr "Reklamlar"

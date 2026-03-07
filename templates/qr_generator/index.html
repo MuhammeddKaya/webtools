@@ -1,0 +1,126 @@
+{% extends 'base/layouts/main.html' %}
+{% load i18n static %}
+
+{% block meta_title %}{% trans "QR Code Generator" %} — WebTools{% endblock %}
+{% block meta_description %}{% trans "Generate custom QR codes with colors, sizes and error correction levels. Download as PNG or SVG. Free online tool." %}{% endblock %}
+
+{% block content %}
+<nav class="wt-breadcrumb" aria-label="Breadcrumb">
+    <a href="{% url 'home' %}">{% trans "Home" %}</a>
+    <span class="wt-breadcrumb__sep"><i class="bi bi-chevron-right"></i></span>
+    <span>{% trans "QR Generator" %}</span>
+</nav>
+
+<div class="wt-panel" style="max-width:800px;margin:0 auto">
+    <div class="wt-panel__header">
+        <h1 class="wt-panel__title"><i class="bi bi-qr-code"
+                style="background:var(--accent-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text"></i>
+            {% trans "QR Code Generator" %}</h1>
+        <p class="wt-panel__subtitle">{% trans "Enter text or URL, customize colors, and generate your QR code." %}</p>
+    </div>
+
+    <form method="post" id="qrForm">
+        {% csrf_token %}
+
+        <div class="wt-form-group">
+            <label class="wt-label" for="textInput">{% trans "Text or URL" %}</label>
+            <textarea name="text" class="wt-textarea" id="textInput" rows="3"
+                placeholder="{% trans 'Enter text or URL to generate QR code' %}"
+                required>{% if qr_data %}{{ qr_data.text }}{% endif %}</textarea>
+        </div>
+
+        <div class="wt-row">
+            <div class="wt-form-group">
+                <label class="wt-label" for="fgColor">{% trans "Foreground Color" %}</label>
+                <div class="flex items-center gap-sm">
+                    <input type="color" name="fg_color" id="fgColor" class="wt-color-picker"
+                        value="{% if qr_data %}{{ qr_data.fg_color }}{% else %}#000000{% endif %}">
+                    <span class="text-muted" style="font-size:var(--fs-sm)" id="fgLabel">{% if qr_data %}{{
+                        qr_data.fg_color }}{% else %}#000000{% endif %}</span>
+                </div>
+            </div>
+            <div class="wt-form-group">
+                <label class="wt-label" for="bgColor">{% trans "Background Color" %}</label>
+                <div class="flex items-center gap-sm">
+                    <input type="color" name="bg_color" id="bgColor" class="wt-color-picker"
+                        value="{% if qr_data %}{{ qr_data.bg_color }}{% else %}#ffffff{% endif %}">
+                    <span class="text-muted" style="font-size:var(--fs-sm)" id="bgLabel">{% if qr_data %}{{
+                        qr_data.bg_color }}{% else %}#ffffff{% endif %}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="wt-row">
+            <div class="wt-form-group">
+                <label class="wt-label" for="sizeInput">{% trans "Size" %}</label>
+                <select name="size" class="wt-select" id="sizeInput">
+                    <option value="5">{% trans "Small" %}</option>
+                    <option value="10" selected>{% trans "Medium" %}</option>
+                    <option value="15">{% trans "Large" %}</option>
+                    <option value="20">{% trans "Extra Large" %}</option>
+                </select>
+            </div>
+            <div class="wt-form-group">
+                <label class="wt-label" for="errorLevel">{% trans "Error Correction" %}</label>
+                <select name="error_level" class="wt-select" id="errorLevel">
+                    <option value="L">L (7%)</option>
+                    <option value="M" selected>M (15%)</option>
+                    <option value="Q">Q (25%)</option>
+                    <option value="H">H (30%)</option>
+                </select>
+            </div>
+        </div>
+
+        <button type="submit" class="wt-btn wt-btn--primary wt-btn--block">
+            <i class="bi bi-qr-code"></i> {% trans "Generate QR Code" %}
+        </button>
+    </form>
+
+    {% if qr_data %}
+    <div class="wt-result mt-xl">
+        <div class="wt-qr-preview" style="background:{{ qr_data.bg_color }}">
+            <img src="{{ qr_data.image }}" alt="QR Code" id="qrImage">
+        </div>
+        <div class="flex justify-center gap-sm mt-lg">
+            <form method="post" style="display:inline">
+                {% csrf_token %}
+                <input type="hidden" name="text" value="{{ qr_data.text }}">
+                <input type="hidden" name="fg_color" value="{{ qr_data.fg_color }}">
+                <input type="hidden" name="bg_color" value="{{ qr_data.bg_color }}">
+                <input type="hidden" name="size" value="{{ qr_data.size }}">
+                <input type="hidden" name="error_level" value="{{ qr_data.error_level }}">
+                <input type="hidden" name="download" value="png">
+                <button type="submit" class="wt-btn wt-btn--secondary">
+                    <i class="bi bi-download"></i> PNG
+                </button>
+            </form>
+            <form method="post" style="display:inline">
+                {% csrf_token %}
+                <input type="hidden" name="text" value="{{ qr_data.text }}">
+                <input type="hidden" name="fg_color" value="{{ qr_data.fg_color }}">
+                <input type="hidden" name="bg_color" value="{{ qr_data.bg_color }}">
+                <input type="hidden" name="size" value="{{ qr_data.size }}">
+                <input type="hidden" name="error_level" value="{{ qr_data.error_level }}">
+                <input type="hidden" name="download" value="svg">
+                <button type="submit" class="wt-btn wt-btn--secondary">
+                    <i class="bi bi-download"></i> SVG
+                </button>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    (function () {
+        document.getElementById('fgColor').addEventListener('input', function (e) {
+            document.getElementById('fgLabel').textContent = e.target.value;
+        });
+        document.getElementById('bgColor').addEventListener('input', function (e) {
+            document.getElementById('bgLabel').textContent = e.target.value;
+        });
+    })();
+</script>
+{% endblock %}

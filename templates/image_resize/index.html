@@ -1,0 +1,165 @@
+{% extends 'base/layouts/main.html' %}
+{% load i18n static %}
+
+{% block meta_title %}{% trans "Image Resize" %} — WebTools{% endblock %}
+{% block meta_description %}{% trans "Resize images to any dimension. Use presets for social media (Instagram, Twitter, Facebook). Free online tool." %}{% endblock %}
+
+{% block content %}
+<nav class="wt-breadcrumb" aria-label="Breadcrumb">
+    <a href="{% url 'home' %}">{% trans "Home" %}</a>
+    <span class="wt-breadcrumb__sep"><i class="bi bi-chevron-right"></i></span>
+    <span>{% trans "Image Resize" %}</span>
+</nav>
+
+<div class="wt-panel" style="max-width:800px;margin:0 auto">
+    <div class="wt-panel__header">
+        <h1 class="wt-panel__title"><i class="bi bi-aspect-ratio"
+                style="background:var(--accent-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent"></i>
+            {% trans "Image Resize" %}</h1>
+        <p class="wt-panel__subtitle">{% trans "Upload an image, set dimensions or choose a preset, and download." %}
+        </p>
+    </div>
+
+    {% if error %}
+    <div class="wt-alert wt-alert--error"><i class="bi bi-exclamation-circle"></i> {{ error }}</div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" id="resizeForm">
+        {% csrf_token %}
+
+        <div class="wt-dropzone" id="dropzone">
+            <div class="wt-dropzone__icon"><i class="bi bi-image"></i></div>
+            <p class="wt-dropzone__text"><strong>{% trans "Click or drag" %}</strong> {% trans "to upload an image" %}
+            </p>
+            <p class="wt-dropzone__hint">JPG, PNG, WEBP, BMP, GIF</p>
+            <input type="file" name="image_file" accept="image/*" required id="imgInput">
+        </div>
+
+        {# Image Preview #}
+        <div id="imgPreviewWrap" class="hidden mt-lg text-center">
+            <img id="imgPreview" src="" alt="Preview"
+                style="max-width:100%;max-height:300px;border-radius:var(--radius-md);border:1px solid var(--border-color)">
+            <p id="origSize" class="text-muted mt-md" style="font-size:var(--fs-sm)"></p>
+        </div>
+
+        {# Presets #}
+        <div class="wt-form-group mt-lg">
+            <label class="wt-label">{% trans "Quick Presets" %}</label>
+            <div class="wt-presets" id="presets">
+                <button type="button" class="wt-preset" data-w="1080" data-h="1080">Instagram Post</button>
+                <button type="button" class="wt-preset" data-w="1080" data-h="1920">IG Story</button>
+                <button type="button" class="wt-preset" data-w="1500" data-h="500">Twitter Header</button>
+                <button type="button" class="wt-preset" data-w="820" data-h="312">Facebook Cover</button>
+                <button type="button" class="wt-preset" data-w="1280" data-h="720">YouTube Thumb</button>
+                <button type="button" class="wt-preset" data-w="800" data-h="600">800×600</button>
+                <button type="button" class="wt-preset" data-w="1920" data-h="1080">1920×1080</button>
+                <button type="button" class="wt-preset" data-w="256" data-h="256">Favicon 256</button>
+            </div>
+        </div>
+
+        {# Dimensions #}
+        <div class="wt-row">
+            <div class="wt-form-group">
+                <label class="wt-label" for="widthInput">{% trans "Width" %} (px)</label>
+                <input type="number" name="width" class="wt-input" id="widthInput" min="1" max="10000"
+                    placeholder="{% trans 'Auto' %}">
+            </div>
+            <div class="wt-form-group flex items-center justify-center" style="max-width:50px;padding-top:1.5rem">
+                <button type="button" id="lockRatio" class="wt-btn wt-btn--secondary wt-btn--sm"
+                    title="{% trans 'Lock aspect ratio' %}" aria-pressed="true">
+                    <i class="bi bi-lock-fill" id="lockIcon"></i>
+                </button>
+            </div>
+            <div class="wt-form-group">
+                <label class="wt-label" for="heightInput">{% trans "Height" %} (px)</label>
+                <input type="number" name="height" class="wt-input" id="heightInput" min="1" max="10000"
+                    placeholder="{% trans 'Auto' %}">
+            </div>
+        </div>
+
+        <div class="wt-form-group">
+            <label class="wt-label" for="outputFormat">{% trans "Output Format" %}</label>
+            <select name="output_format" class="wt-select" id="outputFormat">
+                <option value="same">{% trans "Same as original" %}</option>
+                <option value="jpg">JPG</option>
+                <option value="png">PNG</option>
+                <option value="webp">WEBP</option>
+            </select>
+        </div>
+
+        <button type="submit" class="wt-btn wt-btn--primary wt-btn--block mt-lg" id="submitBtn" disabled>
+            <i class="bi bi-download"></i> {% trans "Resize & Download" %}
+        </button>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    (function () {
+        const dropzone = document.getElementById('dropzone');
+        const imgInput = document.getElementById('imgInput');
+        const imgPreviewWrap = document.getElementById('imgPreviewWrap');
+        const imgPreview = document.getElementById('imgPreview');
+        const origSize = document.getElementById('origSize');
+        const widthInput = document.getElementById('widthInput');
+        const heightInput = document.getElementById('heightInput');
+        const lockBtn = document.getElementById('lockRatio');
+        const lockIcon = document.getElementById('lockIcon');
+        const submitBtn = document.getElementById('submitBtn');
+
+        let aspectRatio = 1;
+        let locked = true;
+        let origW = 0, origH = 0;
+
+        new DragDropUpload(dropzone, {
+            accept: 'image/*',
+            onFilesAdded(files) {
+                if (files.length) {
+                    const dt = new DataTransfer();
+                    dt.items.add(files[0]);
+                    imgInput.files = dt.files;
+
+                    const url = URL.createObjectURL(files[0]);
+                    const img = new Image();
+                    img.onload = () => {
+                        origW = img.naturalWidth;
+                        origH = img.naturalHeight;
+                        aspectRatio = origW / origH;
+                        origSize.textContent = `Original: ${origW} × ${origH} px`;
+                        imgPreview.src = url;
+                        imgPreviewWrap.classList.remove('hidden');
+                        submitBtn.disabled = false;
+                    };
+                    img.src = url;
+                }
+            }
+        });
+
+        lockBtn.addEventListener('click', () => {
+            locked = !locked;
+            lockIcon.className = locked ? 'bi bi-lock-fill' : 'bi bi-unlock';
+            lockBtn.setAttribute('aria-pressed', locked);
+        });
+
+        widthInput.addEventListener('input', () => {
+            if (locked && widthInput.value) {
+                heightInput.value = Math.round(parseInt(widthInput.value) / aspectRatio);
+            }
+        });
+        heightInput.addEventListener('input', () => {
+            if (locked && heightInput.value) {
+                widthInput.value = Math.round(parseInt(heightInput.value) * aspectRatio);
+            }
+        });
+
+        // Presets
+        document.getElementById('presets').addEventListener('click', e => {
+            const btn = e.target.closest('.wt-preset');
+            if (!btn) return;
+            widthInput.value = btn.dataset.w;
+            heightInput.value = btn.dataset.h;
+        });
+    })();
+</script>
+{% endblock %}

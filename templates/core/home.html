@@ -1,0 +1,93 @@
+{% extends 'base/layouts/main.html' %}
+{% load i18n %}
+
+{% block meta_title %}WebTools — {% trans "Free Online PDF, Image & Text Tools" %}{% endblock %}
+{% block meta_description %}{% trans "Free online tools: split and merge PDFs, remove backgrounds, resize images, generate QR codes, format text and more. No signup required." %}{% endblock %}
+
+{% block container_class %}wt-container--home{% endblock %}
+
+{% block content %}
+{# ===== Hero Section ===== #}
+<section class="wt-hero">
+    <h1 class="wt-hero__title">{% trans "Your Online Toolbox" %}</h1>
+    <p class="wt-hero__subtitle">{% trans "Free, fast and private tools for PDF, image, text and more. No signup required." %}</p>
+
+    <div class="wt-search">
+        <i class="bi bi-search wt-search__icon"></i>
+        <input type="text" class="wt-search__input" id="toolSearch" placeholder="{% trans 'Search tools...' %}"
+            aria-label="{% trans 'Search tools' %}" autocomplete="off">
+    </div>
+</section>
+
+{# ===== Category Tabs ===== #}
+<div class="wt-tabs" role="tablist" aria-label="{% trans 'Tool categories' %}">
+    <button class="wt-tab active" data-category="all" role="tab" aria-selected="true">{% trans "All Tools" %}</button>
+    <button class="wt-tab" data-category="pdf" role="tab" aria-selected="false"><i class="bi bi-file-earmark-pdf"></i>
+        PDF</button>
+    <button class="wt-tab" data-category="image" role="tab" aria-selected="false"><i class="bi bi-image"></i> {% trans "Image" %}</button>
+    <button class="wt-tab" data-category="text" role="tab" aria-selected="false"><i class="bi bi-fonts"></i> {% trans "Text" %}</button>
+    <button class="wt-tab" data-category="other" role="tab" aria-selected="false"><i class="bi bi-grid"></i> {% trans "Other" %}</button>
+</div>
+
+{# ===== Tool Cards Grid ===== #}
+<div class="wt-grid" id="toolGrid">
+    {% for tool in tools %}
+    <article class="wt-card" data-category="{{ tool.category }}" data-name="{{ tool.name }}">
+        <div class="wt-card__icon" aria-hidden="true">
+            <i class="bi {{ tool.icon }}"></i>
+        </div>
+        <h2 class="wt-card__title">{{ tool.name }}</h2>
+        <p class="wt-card__desc">{{ tool.desc }}</p>
+        <a href="{% url tool.url %}" class="wt-card__link" aria-label="{{ tool.name }}">{% trans "Open Tool" %}</a>
+    </article>
+    {% endfor %}
+</div>
+
+{# No results #}
+<div id="noResults" class="hidden text-center mt-xl" style="padding:3rem 0">
+    <i class="bi bi-search" style="font-size:3rem;color:var(--text-muted)"></i>
+    <p class="mt-md text-muted">{% trans "No tools found matching your search." %}</p>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    (function () {
+        var grid = document.getElementById('toolGrid');
+        var cards = grid.querySelectorAll('.wt-card');
+        var searchInput = document.getElementById('toolSearch');
+        var tabs = document.querySelectorAll('.wt-tab');
+        var noResults = document.getElementById('noResults');
+        var activeCategory = 'all';
+
+        function filterCards() {
+            var query = searchInput.value.toLowerCase().trim();
+            var visible = 0;
+
+            cards.forEach(function (card) {
+                var name = card.dataset.name.toLowerCase();
+                var cat = card.dataset.category;
+                var matchesSearch = !query || name.indexOf(query) !== -1;
+                var matchesCategory = activeCategory === 'all' || cat === activeCategory;
+                var show = matchesSearch && matchesCategory;
+                card.style.display = show ? '' : 'none';
+                if (show) visible++;
+            });
+
+            noResults.classList.toggle('hidden', visible > 0);
+        }
+
+        searchInput.addEventListener('input', filterCards);
+
+        tabs.forEach(function (tab) {
+            tab.addEventListener('click', function () {
+                tabs.forEach(function (t) { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
+                tab.classList.add('active');
+                tab.setAttribute('aria-selected', 'true');
+                activeCategory = tab.dataset.category;
+                filterCards();
+            });
+        });
+    })();
+</script>
+{% endblock %}

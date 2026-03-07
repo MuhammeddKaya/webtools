@@ -1,0 +1,119 @@
+{% extends 'base/layouts/main.html' %}
+{% load i18n static %}
+
+{% block meta_title %}{% trans "Image to PDF" %} — WebTools{% endblock %}
+{% block meta_description %}{% trans "Convert and merge multiple images into a single PDF document. Drag to reorder pages. Free online tool." %}{% endblock %}
+
+{% block content %}
+<nav class="wt-breadcrumb" aria-label="Breadcrumb">
+    <a href="{% url 'home' %}">{% trans "Home" %}</a>
+    <span class="wt-breadcrumb__sep"><i class="bi bi-chevron-right"></i></span>
+    <span>{% trans "Image to PDF" %}</span>
+</nav>
+
+<div class="wt-panel" style="max-width:800px;margin:0 auto">
+    <div class="wt-panel__header">
+        <h1 class="wt-panel__title"><i class="bi bi-file-earmark-pdf"
+                style="background:var(--accent-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent"></i>
+            {% trans "Image to PDF" %}</h1>
+        <p class="wt-panel__subtitle">{% trans "Upload images, drag to reorder, and convert to a PDF." %}</p>
+    </div>
+
+    {% if error %}
+    <div class="wt-alert wt-alert--error"><i class="bi bi-exclamation-circle"></i> {{ error }}</div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" id="imgToPdfForm">
+        {% csrf_token %}
+
+        <div class="wt-dropzone" id="dropzone">
+            <div class="wt-dropzone__icon"><i class="bi bi-images"></i></div>
+            <p class="wt-dropzone__text"><strong>{% trans "Click or drag" %}</strong> {% trans "to upload images" %}</p>
+            <p class="wt-dropzone__hint">JPG, PNG, WEBP, BMP, GIF</p>
+            <input type="file" name="images" accept="image/*" multiple id="imgInput">
+        </div>
+
+        {# Image Previews #}
+        <div class="wt-thumb-grid mt-lg" id="imgPreview"></div>
+
+        <ul class="wt-file-list" id="fileList"></ul>
+
+        <div class="wt-row mt-lg">
+            <div class="wt-form-group">
+                <label class="wt-label" for="pageSizeSelect">{% trans "Page Size" %}</label>
+                <select name="page_size" class="wt-select" id="pageSizeSelect">
+                    <option value="original" selected>{% trans "Original Size" %}</option>
+                    <option value="a4">A4</option>
+                    <option value="letter">Letter</option>
+                </select>
+            </div>
+            <div class="wt-form-group">
+                <label class="wt-label" for="orientSelect">{% trans "Orientation" %}</label>
+                <select name="orientation" class="wt-select" id="orientSelect">
+                    <option value="portrait" selected>{% trans "Portrait" %}</option>
+                    <option value="landscape">{% trans "Landscape" %}</option>
+                </select>
+            </div>
+        </div>
+
+        <button type="submit" class="wt-btn wt-btn--primary wt-btn--block mt-lg" id="submitBtn" disabled>
+            <i class="bi bi-file-earmark-pdf"></i> {% trans "Convert to PDF" %}
+        </button>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    (function () {
+        const dropzone = document.getElementById('dropzone');
+        const imgInput = document.getElementById('imgInput');
+        const fileListEl = document.getElementById('fileList');
+        const imgPreview = document.getElementById('imgPreview');
+        const submitBtn = document.getElementById('submitBtn');
+        let files = [];
+
+        const fileListUI = new FileListUI(fileListEl, {
+            sortable: true,
+            onRemove(idx) {
+                files.splice(idx, 1);
+                syncAndRender();
+            },
+            onReorder(from, to) {
+                const item = files.splice(from, 1)[0];
+                files.splice(to, 0, item);
+                syncAndRender();
+            }
+        });
+
+        new DragDropUpload(dropzone, {
+            accept: 'image/*',
+            multiple: true,
+            onFilesAdded(allFiles, newFiles) {
+                files = [...files, ...newFiles];
+                syncAndRender();
+            }
+        });
+
+        function syncAndRender() {
+            fileListUI.render(files);
+            submitBtn.disabled = files.length === 0;
+            const dt = new DataTransfer();
+            files.forEach(f => dt.items.add(f));
+            imgInput.files = dt.files;
+
+            // Render image previews
+            imgPreview.innerHTML = '';
+            files.forEach((f, i) => {
+                const url = URL.createObjectURL(f);
+                imgPreview.innerHTML += `
+                <div class="wt-thumb selected" style="cursor:default">
+                    <img src="${url}" alt="${f.name}">
+                    <span class="wt-thumb__label">${i + 1}</span>
+                </div>
+            `;
+            });
+        }
+    })();
+</script>
+{% endblock %}

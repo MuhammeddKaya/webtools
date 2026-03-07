@@ -1,0 +1,229 @@
+{% extends 'base/layouts/main.html' %}
+{% load i18n static %}
+
+{% block meta_title %}{% trans "PDF Splitter" %} — WebTools{% endblock %}
+{% block meta_description %}{% trans "Split PDF files into individual pages or extract specific page ranges. Free online tool, no signup required." %}{% endblock %}
+
+{% block content %}
+<nav class="wt-breadcrumb" aria-label="Breadcrumb">
+    <a href="{% url 'home' %}">{% trans "Home" %}</a>
+    <span class="wt-breadcrumb__sep"><i class="bi bi-chevron-right"></i></span>
+    <span>{% trans "PDF Split" %}</span>
+</nav>
+
+<div class="wt-panel" style="max-width:800px;margin:0 auto">
+    <div class="wt-panel__header">
+        <h1 class="wt-panel__title"><i class="bi bi-scissors"
+                style="background:var(--accent-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent"></i>
+            {% trans "PDF Splitter" %}</h1>
+        <p class="wt-panel__subtitle">{% trans "Upload a PDF, select the pages you want, and download." %}</p>
+    </div>
+
+    {% if error %}
+    <div class="wt-alert wt-alert--error"><i class="bi bi-exclamation-circle"></i> {{ error }}</div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" id="splitForm">
+        {% csrf_token %}
+
+        {# Drop Zone #}
+        <div class="wt-dropzone" id="dropzone">
+            <div class="wt-dropzone__icon"><i class="bi bi-file-earmark-pdf"></i></div>
+            <p class="wt-dropzone__text"><strong>{% trans "Click or drag" %}</strong> {% trans "to upload a PDF" %}</p>
+            <p class="wt-dropzone__hint">{% trans "Max 50MB" %}</p>
+            <input type="file" name="pdf_file" accept=".pdf" required id="pdfInput">
+        </div>
+
+        {# File info #}
+        <div id="fileInfo" class="hidden mt-lg">
+            <ul class="wt-file-list" id="fileList"></ul>
+        </div>
+
+        {# Page Thumbnails Grid #}
+        <div id="pageSelector" class="hidden mt-lg">
+            <div class="flex justify-between items-center mb-md">
+                <p class="wt-label" style="margin:0">{% trans "Select pages to extract" %} (<span
+                        id="selectedCount">0</span> {% trans "selected" %})</p>
+                <div class="flex gap-sm">
+                    <button type="button" class="wt-btn wt-btn--secondary wt-btn--sm" id="selectAll">{% trans "Select All" %}</button>
+                    <button type="button" class="wt-btn wt-btn--secondary wt-btn--sm" id="deselectAll">{% trans "Deselect All" %}</button>
+                </div>
+            </div>
+            <div class="wt-thumb-grid" id="thumbGrid"></div>
+        </div>
+
+        {# Page range input #}
+        <div class="wt-form-group mt-lg" id="rangeGroup" style="display:none">
+            <label class="wt-label" for="pagesInput">{% trans "Pages to Extract" %}</label>
+            <input type="text" name="pages" class="wt-input" id="pagesInput" placeholder="{% trans 'e.g. 1, 3-5, 8' %}">
+            <p class="wt-form-text">{% trans "Click thumbnails above or type page numbers/ranges." %}</p>
+        </div>
+
+        {# Loading indicator #}
+        <div id="loadingPreview" class="hidden mt-lg text-center">
+            <div class="wt-spinner"></div>
+            <p class="text-muted mt-md" style="font-size:var(--fs-sm)">{% trans "Loading page preview..." %}</p>
+        </div>
+
+        <button type="submit" class="wt-btn wt-btn--primary wt-btn--block mt-lg" id="submitBtn" disabled>
+            <i class="bi bi-scissors"></i> {% trans "Extract Pages" %}
+        </button>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    (function () {
+        const dropzone = document.getElementById('dropzone');
+        const pdfInput = document.getElementById('pdfInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileList = document.getElementById('fileList');
+        const pageSelector = document.getElementById('pageSelector');
+        const thumbGrid = document.getElementById('thumbGrid');
+        const rangeGroup = document.getElementById('rangeGroup');
+        const pagesInput = document.getElementById('pagesInput');
+        const loadingPreview = document.getElementById('loadingPreview');
+        const submitBtn = document.getElementById('submitBtn');
+        const selectedCountEl = document.getElementById('selectedCount');
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        let selectedPages = new Set();
+        let totalPages = 0;
+
+        // Drag & drop
+        new DragDropUpload(dropzone, {
+            accept: '.pdf',
+            maxSize: 50 * 1024 * 1024,
+            onFilesAdded(files) {
+                if (files.length) {
+                    // Update native input for form submission
+                    const dt = new DataTransfer();
+                    dt.items.add(files[0]);
+                    pdfInput.files = dt.files;
+                    showFile(files[0]);
+                    loadPreview(files[0]);
+                }
+            }
+        });
+
+        function showFile(file) {
+            fileInfo.classList.remove('hidden');
+            fileList.innerHTML = `
+            <li class="wt-file-item">
+                <span class="wt-file-item__icon"><i class="bi bi-file-earmark-pdf-fill"></i></span>
+                <div class="wt-file-item__info">
+                    <div class="wt-file-item__name">${file.name}</div>
+                    <div class="wt-file-item__size">${formatSize(file.size)}</div>
+                </div>
+            </li>
+        `;
+        }
+
+        function loadPreview(file) {
+            pageSelector.classList.add('hidden');
+            loadingPreview.classList.remove('hidden');
+            thumbGrid.innerHTML = '';
+            selectedPages.clear();
+            updateSelectedCount();
+
+            const formData = new FormData();
+            formData.append('pdf_file', file);
+
+            fetch('{% url "pdf_split:preview" %}', {
+                method: 'POST',
+                headers: { 'X-CSRFToken': csrfToken },
+                body: formData
+            })
+                .then(r => r.json())
+                .then(data => {
+                    loadingPreview.classList.add('hidden');
+                    if (data.error) {
+                        Toast.show(data.error, 'error');
+                        return;
+                    }
+                    totalPages = data.total;
+                    renderThumbnails(data.pages);
+                    pageSelector.classList.remove('hidden');
+                    rangeGroup.style.display = '';
+                    submitBtn.disabled = false;
+                })
+                .catch(() => {
+                    loadingPreview.classList.add('hidden');
+                    Toast.show('Failed to load preview', 'error');
+                });
+        }
+
+        function renderThumbnails(pages) {
+            thumbGrid.innerHTML = pages.map(p => `
+            <div class="wt-thumb" data-page="${p.index}" tabindex="0" role="checkbox" aria-checked="false" aria-label="Page ${p.index}">
+                <img src="${p.thumbnail}" alt="Page ${p.index}" loading="lazy">
+                <span class="wt-thumb__label">Page ${p.index}</span>
+                <span class="wt-thumb__check"><i class="bi bi-check"></i></span>
+            </div>
+        `).join('');
+
+            thumbGrid.querySelectorAll('.wt-thumb').forEach(thumb => {
+                thumb.addEventListener('click', () => togglePage(thumb));
+                thumb.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); togglePage(thumb); } });
+            });
+        }
+
+        function togglePage(thumb) {
+            const page = parseInt(thumb.dataset.page);
+            if (selectedPages.has(page)) {
+                selectedPages.delete(page);
+                thumb.classList.remove('selected');
+                thumb.setAttribute('aria-checked', 'false');
+            } else {
+                selectedPages.add(page);
+                thumb.classList.add('selected');
+                thumb.setAttribute('aria-checked', 'true');
+            }
+            updateSelectedCount();
+            updatePagesInput();
+        }
+
+        function updateSelectedCount() {
+            selectedCountEl.textContent = selectedPages.size;
+        }
+
+        function updatePagesInput() {
+            const sorted = [...selectedPages].sort((a, b) => a - b);
+            const ranges = [];
+            let start = null, end = null;
+            for (const p of sorted) {
+                if (start === null) { start = end = p; }
+                else if (p === end + 1) { end = p; }
+                else {
+                    ranges.push(start === end ? `${start}` : `${start}-${end}`);
+                    start = end = p;
+                }
+            }
+            if (start !== null) ranges.push(start === end ? `${start}` : `${start}-${end}`);
+            pagesInput.value = ranges.join(', ');
+        }
+
+        // Select / Deselect all
+        document.getElementById('selectAll').addEventListener('click', () => {
+            thumbGrid.querySelectorAll('.wt-thumb').forEach(t => {
+                const page = parseInt(t.dataset.page);
+                selectedPages.add(page);
+                t.classList.add('selected');
+                t.setAttribute('aria-checked', 'true');
+            });
+            updateSelectedCount();
+            updatePagesInput();
+        });
+        document.getElementById('deselectAll').addEventListener('click', () => {
+            selectedPages.clear();
+            thumbGrid.querySelectorAll('.wt-thumb').forEach(t => {
+                t.classList.remove('selected');
+                t.setAttribute('aria-checked', 'false');
+            });
+            updateSelectedCount();
+            updatePagesInput();
+        });
+    })();
+</script>
+{% endblock %}

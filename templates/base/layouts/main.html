@@ -1,0 +1,158 @@
+{% load i18n static ads_tags %}
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}" dir="ltr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    {# SEO Meta #}
+    <title>{% block meta_title %}WebTools — Free Online Tools{% endblock %}</title>
+    <meta name="description"
+        content="{% block meta_description %}Free online tools: PDF editor, image converter, background remover, QR generator, text tools and more. No signup required.{% endblock %}">
+    <meta name="keywords"
+        content="{% block meta_keywords %}pdf tools, image resize, background remover, qr code generator, text tools, online converter{% endblock %}">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="{% block canonical %}{% endblock %}">
+
+    {# Open Graph #}
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{% block og_title %}WebTools — Free Online Tools{% endblock %}">
+    <meta property="og:description"
+        content="{% block og_description %}Free online PDF, image, text and audio tools. No signup required.{% endblock %}">
+    <meta property="og:site_name" content="WebTools">
+
+    {# Twitter Card #}
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="{% block tw_title %}WebTools{% endblock %}">
+
+    {# Structured Data #}
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "WebTools",
+        "url": "{{ request.build_absolute_uri }}",
+        "description": "Free online PDF, image, text and audio tools",
+        "applicationCategory": "UtilityApplication",
+        "operatingSystem": "Any",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        }
+    }
+    </script>
+    {% block extra_structured_data %}{% endblock %}
+
+    {# Styles #}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+    {# ===== Navbar ===== #}
+    <nav class="wt-navbar" role="navigation" aria-label="{% trans 'Main navigation' %}">
+        <div class="container">
+            <a href="{% url 'home' %}" class="wt-navbar__brand" aria-label="WebTools Home">
+                <i class="bi bi-tools"></i> WebTools
+            </a>
+
+            <button class="wt-navbar__toggle" aria-label="{% trans 'Toggle menu' %}" aria-expanded="false">
+                <i class="bi bi-list"></i>
+            </button>
+
+            <ul class="wt-navbar__nav">
+                <li>
+                    <a href="{% url 'home' %}" class="wt-navbar__link">
+                        <i class="bi bi-house"></i> {% trans "Home" %}
+                    </a>
+                </li>
+                <li class="wt-lang-dropdown">
+                    <button class="wt-navbar__link" aria-haspopup="true">
+                        <i class="bi bi-globe2"></i> {% trans "Language" %}
+                        <i class="bi bi-chevron-down" style="font-size:0.7em"></i>
+                    </button>
+                    <div class="wt-lang-dropdown__menu" role="menu">
+                        {% get_current_language as CURRENT_LANG %}
+                        {% get_available_languages as LANGUAGES %}
+                        {% for lang_code, lang_name in LANGUAGES %}
+                        <form action="{% url 'set_language' %}" method="post">
+                            {% csrf_token %}
+                            <input name="next" type="hidden" value="{{ request.get_full_path }}">
+                            <input name="language" type="hidden" value="{{ lang_code }}">
+                            <button type="submit"
+                                class="wt-lang-dropdown__item {% if lang_code == CURRENT_LANG %}active{% endif %}"
+                                role="menuitem">
+                                {{ lang_name }}
+                            </button>
+                        </form>
+                        {% endfor %}
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    {# ===== Header Banner Ad ===== #}
+    {% show_ad "header_banner" as header_ad %}
+    {% if header_ad %}
+    <div class="wt-ad wt-ad--header">{{ header_ad }}</div>
+    {% endif %}
+
+    {# ===== Main Content with Sidebar Ads ===== #}
+    <div class="wt-layout">
+        {# Left Sidebar Ad #}
+        {% show_ad "sidebar_left" as left_ad %}
+        {% if left_ad %}
+        <aside class="wt-ad wt-ad--sidebar wt-ad--left" aria-label="Advertisement">
+            <div class="wt-ad__inner">{{ left_ad }}</div>
+        </aside>
+        {% endif %}
+
+        {# Main Content #}
+        <main class="wt-layout__main">
+            <div class="wt-container {% block container_class %}{% endblock %}">
+                {% block breadcrumb %}{% endblock %}
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+
+        {# Right Sidebar Ad #}
+        {% show_ad "sidebar_right" as right_ad %}
+        {% if right_ad %}
+        <aside class="wt-ad wt-ad--sidebar wt-ad--right" aria-label="Advertisement">
+            <div class="wt-ad__inner">{{ right_ad }}</div>
+        </aside>
+        {% endif %}
+    </div>
+
+    {# ===== Footer ===== #}
+    <footer class="wt-footer" role="contentinfo">
+        <div class="wt-container">
+            {# Footer Banner Ad #}
+            {% show_ad "footer_banner" as footer_ad %}
+            {% if footer_ad %}
+            <div class="wt-ad wt-ad--footer mb-lg">{{ footer_ad }}</div>
+            {% endif %}
+
+            <ul class="wt-footer__links" aria-label="{% trans 'Tool links' %}">
+                <li><a href="{% url 'pdf_split:index' %}">PDF Split</a></li>
+                <li><a href="{% url 'pdf_merge:index' %}">PDF Merge</a></li>
+                <li><a href="{% url 'bg_remove:index' %}">{% trans "BG Remover" %}</a></li>
+                <li><a href="{% url 'image_resize:index' %}">{% trans "Image Resize" %}</a></li>
+                <li><a href="{% url 'qr_generator:index' %}">{% trans "QR Generator" %}</a></li>
+                <li><a href="{% url 'word_counter:index' %}">{% trans "Word Counter" %}</a></li>
+            </ul>
+            <p>&copy; 2026 WebTools — {% trans "Free online tools for everyone." %}</p>
+        </div>
+    </footer>
+
+    {# ===== Scripts ===== #}
+    <script src="{% static 'js/components.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+
+</html>

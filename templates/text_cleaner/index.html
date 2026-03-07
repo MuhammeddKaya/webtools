@@ -1,0 +1,83 @@
+{% extends 'base/layouts/main.html' %}
+{% load i18n static %}
+
+{% block meta_title %}{% trans "Text Cleaner" %} — WebTools{% endblock %}
+{% block meta_description %}{% trans "Clean up text by removing extra spaces, blank lines, HTML tags and special characters. Free online tool." %}{% endblock %}
+
+{% block content %}
+<nav class="wt-breadcrumb" aria-label="Breadcrumb">
+    <a href="{% url 'home' %}">{% trans "Home" %}</a>
+    <span class="wt-breadcrumb__sep"><i class="bi bi-chevron-right"></i></span>
+    <span>{% trans "Text Cleaner" %}</span>
+</nav>
+
+<div class="wt-panel" style="max-width:900px;margin:0 auto">
+    <div class="wt-panel__header">
+        <h1 class="wt-panel__title"><i class="bi bi-magic"
+                style="background:var(--accent-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent"></i>
+            {% trans "Text Cleaner" %}</h1>
+        <p class="wt-panel__subtitle">{% trans "Choose cleaning options and paste your messy text." %}</p>
+    </div>
+
+    <form method="post" id="cleanForm">
+        {% csrf_token %}
+
+        <div class="wt-form-group">
+            <label class="wt-label">{% trans "Cleaning Options" %}</label>
+            <div class="wt-check-group">
+                <label class="wt-check-label">
+                    <input type="checkbox" name="extra_spaces" {% if options.extra_spaces or not options %}checked{% endif %}>
+                    <span>{% trans "Remove extra spaces" %}</span>
+                </label>
+                <label class="wt-check-label">
+                    <input type="checkbox" name="empty_lines" {% if options.empty_lines %}checked{% endif %}>
+                    <span>{% trans "Remove empty lines" %}</span>
+                </label>
+                <label class="wt-check-label">
+                    <input type="checkbox" name="trim_lines" {% if options.trim_lines %}checked{% endif %}>
+                    <span>{% trans "Trim line edges" %}</span>
+                </label>
+                <label class="wt-check-label">
+                    <input type="checkbox" name="tabs_to_spaces" {% if options.tabs_to_spaces %}checked{% endif %}>
+                    <span>{% trans "Tabs → Spaces" %}</span>
+                </label>
+                <label class="wt-check-label">
+                    <input type="checkbox" name="duplicate_lines" {% if options.duplicate_lines %}checked{% endif %}>
+                    <span>{% trans "Merge duplicate blank lines" %}</span>
+                </label>
+                <label class="wt-check-label">
+                    <input type="checkbox" name="html_tags" {% if options.html_tags %}checked{% endif %}>
+                    <span>{% trans "Strip HTML tags" %}</span>
+                </label>
+                <label class="wt-check-label">
+                    <input type="checkbox" name="special_chars" {% if options.special_chars %}checked{% endif %}>
+                    <span>{% trans "Remove special characters" %}</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="wt-form-group">
+            <label class="wt-label" for="textInput">{% trans "Input Text" %}</label>
+            <textarea name="text" class="wt-textarea" id="textInput" rows="8"
+                placeholder="{% trans 'Paste your text here...' %}">{{ input_text }}</textarea>
+        </div>
+
+        <button type="submit" class="wt-btn wt-btn--primary wt-btn--block">
+            <i class="bi bi-magic"></i> {% trans "Clean Text" %}
+        </button>
+    </form>
+
+    {% if result %}
+    <div class="wt-result">
+        <div class="wt-result__header">
+            <span class="wt-result__title">{% trans "Cleaned Result" %}</span>
+            <button type="button" class="wt-btn wt-btn--secondary wt-btn--sm"
+                onclick="copyToClipboard(document.getElementById('resultText').value)">
+                <i class="bi bi-clipboard"></i> {% trans "Copy" %}
+            </button>
+        </div>
+        <textarea class="wt-textarea" id="resultText" rows="8" readonly>{{ result }}</textarea>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

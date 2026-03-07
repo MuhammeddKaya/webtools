@@ -1,0 +1,94 @@
+{% extends 'base/layouts/main.html' %}
+{% load i18n static %}
+
+{% block meta_title %}{% trans "PDF to Image" %} — WebTools{% endblock %}
+{% block meta_description %}{% trans "Convert PDF pages to high-quality JPG, PNG or WEBP images. Choose DPI and specific pages. Free online tool." %}{% endblock %}
+
+{% block content %}
+<nav class="wt-breadcrumb" aria-label="Breadcrumb">
+    <a href="{% url 'home' %}">{% trans "Home" %}</a>
+    <span class="wt-breadcrumb__sep"><i class="bi bi-chevron-right"></i></span>
+    <span>{% trans "PDF to Image" %}</span>
+</nav>
+
+<div class="wt-panel" style="max-width:800px;margin:0 auto">
+    <div class="wt-panel__header">
+        <h1 class="wt-panel__title"><i class="bi bi-file-earmark-image"
+                style="background:var(--accent-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent"></i>
+            {% trans "PDF to Image" %}</h1>
+        <p class="wt-panel__subtitle">{% trans "Convert PDF pages to JPG, PNG or WEBP images." %}</p>
+    </div>
+
+    {% if error %}
+    <div class="wt-alert wt-alert--error"><i class="bi bi-exclamation-circle"></i> {{ error }}</div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="wt-dropzone" id="dropzone">
+            <div class="wt-dropzone__icon"><i class="bi bi-file-earmark-pdf"></i></div>
+            <p class="wt-dropzone__text"><strong>{% trans "Click or drag" %}</strong> {% trans "to upload a PDF" %}</p>
+            <p class="wt-dropzone__hint">{% trans "Max 50MB" %}</p>
+            <input type="file" name="pdf_file" accept=".pdf" required id="pdfInput">
+        </div>
+
+        <ul class="wt-file-list" id="fileList"></ul>
+
+        <div class="wt-row mt-lg">
+            <div class="wt-form-group">
+                <label class="wt-label" for="formatSelect">{% trans "Output Format" %}</label>
+                <select name="format" class="wt-select" id="formatSelect">
+                    <option value="jpg" selected>JPG</option>
+                    <option value="png">PNG</option>
+                    <option value="webp">WEBP</option>
+                </select>
+            </div>
+            <div class="wt-form-group">
+                <label class="wt-label" for="dpiSelect">{% trans "Quality (DPI)" %}</label>
+                <select name="dpi" class="wt-select" id="dpiSelect">
+                    <option value="72">72 DPI ({% trans "Fast" %})</option>
+                    <option value="150" selected>150 DPI ({% trans "Standard" %})</option>
+                    <option value="300">300 DPI ({% trans "High Quality" %})</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="wt-form-group">
+            <label class="wt-label" for="pagesInput">{% trans "Pages" %}</label>
+            <input type="text" name="pages" class="wt-input" id="pagesInput"
+                placeholder="{% trans 'All pages (or e.g. 1, 3-5)' %}">
+            <p class="wt-form-text">{% trans "Leave empty to convert all pages." %}</p>
+        </div>
+
+        <button type="submit" class="wt-btn wt-btn--primary wt-btn--block mt-lg" id="submitBtn" disabled>
+            <i class="bi bi-download"></i> {% trans "Convert & Download" %}
+        </button>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    (function () {
+        const dropzone = document.getElementById('dropzone');
+        const pdfInput = document.getElementById('pdfInput');
+        const fileListEl = document.getElementById('fileList');
+        const submitBtn = document.getElementById('submitBtn');
+
+        new DragDropUpload(dropzone, {
+            accept: '.pdf',
+            onFilesAdded(files) {
+                if (files.length) {
+                    const dt = new DataTransfer();
+                    dt.items.add(files[0]);
+                    pdfInput.files = dt.files;
+                    const fui = new FileListUI(fileListEl);
+                    fui.render(files);
+                    submitBtn.disabled = false;
+                }
+            }
+        });
+    })();
+</script>
+{% endblock %}

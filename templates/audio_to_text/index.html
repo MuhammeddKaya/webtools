@@ -1,0 +1,96 @@
+{% extends 'base/layouts/main.html' %}
+{% load i18n static %}
+
+{% block meta_title %}{% trans "Audio to Text" %} — WebTools{% endblock %}
+{% block meta_description %}{% trans "Transcribe audio files to text." %}{% endblock %}
+
+{% block content %}
+<nav class="wt-breadcrumb" aria-label="Breadcrumb">
+    <a href="{% url 'home' %}">{% trans "Home" %}</a>
+    <span class="wt-breadcrumb__sep"><i class="bi bi-chevron-right"></i></span>
+    <span>{% trans "Audio to Text" %}</span>
+</nav>
+
+<div class="wt-panel" style="max-width:800px;margin:0 auto">
+    <div class="wt-panel__header">
+        <h1 class="wt-panel__title">
+            <i class="bi bi-mic" style="background:var(--accent-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text"></i>
+            {% trans "Audio to Text" %}
+        </h1>
+        <p class="wt-panel__subtitle">{% trans "Upload an audio file and transcribe it to text using Google Speech Recognition." %}</p>
+    </div>
+
+    {% if result and result|slice:":6" == "ERROR:" %}
+    <div class="wt-alert wt-alert--error">
+        <i class="bi bi-exclamation-circle"></i> {{ result|slice:"6:" }}
+    </div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" id="audioForm">
+        {% csrf_token %}
+
+        <div class="wt-dropzone" id="dropzone">
+            <div class="wt-dropzone__icon"><i class="bi bi-mic"></i></div>
+            <p class="wt-dropzone__text"><strong>{% trans "Click or drag" %}</strong> {% trans "to upload an audio file" %}</p>
+            <p class="wt-dropzone__hint">WAV, MP3, M4A, OGG, FLAC &bull; {% trans "Max 25MB" %}</p>
+            <input type="file" name="audio_file" accept=".wav,.mp3,.m4a,.ogg,.flac" required id="audioInput">
+        </div>
+
+        <ul class="wt-file-list" id="fileList"></ul>
+
+        <div class="wt-form-group mt-lg">
+            <label class="wt-label" for="langSelect">{% trans "Language" %}</label>
+            <select name="language" class="wt-select" id="langSelect">
+                {% for code, name in languages %}
+                <option value="{{ code }}" {% if code == selected_lang %}selected{% endif %}>{{ name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <button type="submit" class="wt-btn wt-btn--primary wt-btn--block mt-lg" id="submitBtn" disabled>
+            <i class="bi bi-mic"></i> {% trans "Transcribe" %}
+        </button>
+
+        <p class="text-muted text-center mt-md" style="font-size:var(--fs-xs)">
+            <i class="bi bi-info-circle"></i> {% trans "Processing may take a while for long audio files." %}
+        </p>
+    </form>
+
+    {% if result and result|slice:":6" != "ERROR:" %}
+    <div class="wt-result mt-xl">
+        <div class="wt-result__header">
+            <span class="wt-result__title">{% trans "Transcription" %}</span>
+            <button type="button" class="wt-btn wt-btn--secondary wt-btn--sm" onclick="copyToClipboard(document.getElementById('resultText').value)">
+                <i class="bi bi-clipboard"></i> {% trans "Copy" %}
+            </button>
+        </div>
+        <textarea class="wt-textarea" id="resultText" rows="8" readonly>{{ result }}</textarea>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function() {
+    var dz = document.getElementById('dropzone');
+    var ai = document.getElementById('audioInput');
+    var fl = document.getElementById('fileList');
+    var sb = document.getElementById('submitBtn');
+    new DragDropUpload(dz, {
+        accept: '.wav,.mp3,.m4a,.ogg,.flac',
+        maxSize: 25 * 1024 * 1024,
+        onFilesAdded: function(files) {
+            if (files.length) {
+                var dt = new DataTransfer();
+                dt.items.add(files[0]);
+                ai.files = dt.files;
+                var fui = new FileListUI(fl);
+                fui.render(files);
+                sb.disabled = false;
+            }
+        }
+    });
+})();
+</script>
+{% endblock %}

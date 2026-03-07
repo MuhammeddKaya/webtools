@@ -1,0 +1,86 @@
+{% extends 'base/layouts/main.html' %}
+{% load i18n static %}
+
+{% block meta_title %}{% trans "PDF Merge" %} — WebTools{% endblock %}
+{% block meta_description %}{% trans "Combine multiple PDF files into one document. Drag and drop to reorder. Free online tool." %}{% endblock %}
+
+{% block content %}
+<nav class="wt-breadcrumb" aria-label="Breadcrumb">
+    <a href="{% url 'home' %}">{% trans "Home" %}</a>
+    <span class="wt-breadcrumb__sep"><i class="bi bi-chevron-right"></i></span>
+    <span>{% trans "PDF Merge" %}</span>
+</nav>
+
+<div class="wt-panel" style="max-width:800px;margin:0 auto">
+    <div class="wt-panel__header">
+        <h1 class="wt-panel__title"><i class="bi bi-files"
+                style="background:var(--accent-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent"></i>
+            {% trans "PDF Merge" %}</h1>
+        <p class="wt-panel__subtitle">{% trans "Upload multiple PDFs, drag to reorder, and merge into one file." %}</p>
+    </div>
+
+    {% if error %}
+    <div class="wt-alert wt-alert--error"><i class="bi bi-exclamation-circle"></i> {{ error }}</div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" id="mergeForm">
+        {% csrf_token %}
+
+        <div class="wt-dropzone" id="dropzone">
+            <div class="wt-dropzone__icon"><i class="bi bi-file-earmark-plus"></i></div>
+            <p class="wt-dropzone__text"><strong>{% trans "Click or drag" %}</strong> {% trans "to upload PDFs" %}</p>
+            <p class="wt-dropzone__hint">{% trans "You can add multiple files" %}</p>
+            <input type="file" name="pdf_files" accept=".pdf" multiple id="pdfInput">
+        </div>
+
+        <ul class="wt-file-list" id="fileList"></ul>
+
+        <button type="submit" class="wt-btn wt-btn--primary wt-btn--block mt-lg" id="submitBtn" disabled>
+            <i class="bi bi-files"></i> {% trans "Merge PDFs" %}
+        </button>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    (function () {
+        const dropzone = document.getElementById('dropzone');
+        const pdfInput = document.getElementById('pdfInput');
+        const fileListEl = document.getElementById('fileList');
+        const submitBtn = document.getElementById('submitBtn');
+        let files = [];
+
+        const fileListUI = new FileListUI(fileListEl, {
+            sortable: true,
+            onRemove(idx) {
+                files.splice(idx, 1);
+                syncAndRender();
+            },
+            onReorder(from, to) {
+                const item = files.splice(from, 1)[0];
+                files.splice(to, 0, item);
+                syncAndRender();
+            }
+        });
+
+        new DragDropUpload(dropzone, {
+            accept: '.pdf',
+            multiple: true,
+            onFilesAdded(allFiles, newFiles) {
+                files = [...files, ...newFiles];
+                syncAndRender();
+            }
+        });
+
+        function syncAndRender() {
+            fileListUI.render(files);
+            submitBtn.disabled = files.length < 2;
+            // Sync native file input
+            const dt = new DataTransfer();
+            files.forEach(f => dt.items.add(f));
+            pdfInput.files = dt.files;
+        }
+    })();
+</script>
+{% endblock %}
