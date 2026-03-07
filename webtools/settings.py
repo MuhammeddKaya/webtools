@@ -19,7 +19,8 @@ SECRET_KEY = os.environ.get(
 
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True').lower() in ('true', '1', 'yes')
 
-ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', '*').split(',')
+ENV_ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', '*').split(',')
+ALLOWED_HOSTS = ['*']
 
 CSRF_TRUSTED_ORIGINS = [
     origin.strip()
@@ -52,9 +53,11 @@ INSTALLED_APPS = [
     'apps.ppt_to_pdf',
     'apps.ads',
     'apps.deploy',
+    'apps.domains',
 ]
 
 MIDDLEWARE = [
+    'apps.domains.middleware.DynamicHostedMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
