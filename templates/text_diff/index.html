@@ -1,0 +1,115 @@
+{% extends 'base/layouts/main.html' %}
+{% load i18n %}
+
+{% block meta_title %}{% trans "Text Diff Checker" %} — WebTools{% endblock %}
+{% block meta_description %}{% trans "Compare two text documents to see the differences and variations online for free."
+%}{% endblock %}
+
+{% block content %}
+<nav class="wt-breadcrumb" aria-label="Breadcrumb">
+    <a href="{% url 'home' %}">{% trans "Home" %}</a>
+    <span class="wt-breadcrumb__sep"><i class="bi bi-chevron-right"></i></span>
+    <span>{% trans "Text Diff Checker" %}</span>
+</nav>
+
+<div class="wt-panel" style="max-width:1200px;margin:0 auto">
+    <div class="wt-panel__header">
+        <h1 class="wt-panel__title"><i class="bi bi-intersect"
+                style="background:var(--accent-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent"></i>
+            {% trans "Text Diff Checker" %}</h1>
+        <p class="wt-panel__subtitle">{% trans "Compare two pieces of text and quickly find the differences." %}</p>
+    </div>
+
+    <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+        <div class="wt-form-group" style="flex: 1; min-width: 300px;">
+            <label class="wt-label">{% trans "Original Text" %}</label>
+            <textarea id="textA" class="wt-input" style="height: 250px; font-family: monospace;"
+                placeholder="{% trans 'Paste original text here...' %}"></textarea>
+        </div>
+        <div class="wt-form-group" style="flex: 1; min-width: 300px;">
+            <label class="wt-label">{% trans "Changed Text" %}</label>
+            <textarea id="textB" class="wt-input" style="height: 250px; font-family: monospace;"
+                placeholder="{% trans 'Paste modified text here...' %}"></textarea>
+        </div>
+    </div>
+
+    <div class="mt-lg">
+        <button type="button" class="wt-btn wt-btn--primary" id="compareBtn">
+            <i class="bi bi-arrows-expand"></i> {% trans "Compare Texts" %}
+        </button>
+        <button type="button" class="wt-btn wt-btn--secondary" id="clearBtn">
+            <i class="bi bi-trash"></i> {% trans "Clear" %}
+        </button>
+    </div>
+
+    <div class="wt-form-group mt-lg">
+        <label class="wt-label">{% trans "Difference Result" %}</label>
+        <div id="diffOutput" class="wt-input"
+            style="height: auto; min-height: 250px; background-color: var(--color-surface); font-family: monospace; white-space: pre-wrap; overflow-x: auto;">
+            <span style="color:var(--text-muted)">{% trans "No differences fetched yet. Click 'Compare Texts'."
+                %}</span>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsdiff/5.2.0/diff.min.js"></script>
+<script>
+    (function () {
+        const textA = document.getElementById('textA');
+        const textB = document.getElementById('textB');
+        const compareBtnEl = document.getElementById('compareBtn');
+        const clearBtnEl = document.getElementById('clearBtn');
+        const diffOutputEl = document.getElementById('diffOutput');
+
+        compareBtnEl.addEventListener('click', () => {
+            const valA = textA.value;
+            const valB = textB.value;
+
+            if (!valA && !valB) {
+                diffOutputEl.innerHTML = '<span style="color:var(--text-muted)">Both texts are empty.</span>';
+                return;
+            }
+
+            if (valA === valB) {
+                diffOutputEl.innerHTML = '<span style="color:#51cf66"><i class="bi bi-check-circle"></i> Texts are absolutely identical.</span>';
+                return;
+            }
+
+            // Perform word-level diff
+            const diff = Diff.diffWordsWithSpace(valA, valB);
+            const fragment = document.createDocumentFragment();
+
+            diff.forEach((part) => {
+                const span = document.createElement('span');
+                if (part.added) {
+                    span.style.backgroundColor = 'rgba(100,255,100,0.2)';
+                    span.style.color = '#51cf66';
+                    span.style.borderRadius = '3px';
+                    span.style.padding = '1px 3px';
+                } else if (part.removed) {
+                    span.style.backgroundColor = 'rgba(255,100,100,0.2)';
+                    span.style.color = '#ff6b6b';
+                    span.style.textDecoration = 'line-through';
+                    span.style.borderRadius = '3px';
+                    span.style.padding = '1px 3px';
+                } else {
+                    span.style.opacity = '0.7';
+                }
+                span.appendChild(document.createTextNode(part.value));
+                fragment.appendChild(span);
+            });
+
+            diffOutputEl.innerHTML = '';
+            diffOutputEl.appendChild(fragment);
+        });
+
+        clearBtnEl.addEventListener('click', () => {
+            textA.value = '';
+            textB.value = '';
+            diffOutputEl.innerHTML = '<span style="color:var(--text-muted)">No differences fetched yet. Click Compare Texts</span>';
+        });
+    })();
+</script>
+{% endblock %}

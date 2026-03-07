@@ -1,0 +1,117 @@
+{% extends 'base/layouts/main.html' %}
+{% load i18n %}
+
+{% block meta_title %}{% trans "Password Generator" %} — WebTools{% endblock %}
+{% block meta_description %}{% trans "Generate random, secure, and unbreakable passwords online." %}{% endblock %}
+
+{% block content %}
+<nav class="wt-breadcrumb" aria-label="Breadcrumb">
+    <a href="{% url 'home' %}">{% trans "Home" %}</a>
+    <span class="wt-breadcrumb__sep"><i class="bi bi-chevron-right"></i></span>
+    <span>{% trans "Password Generator" %}</span>
+</nav>
+
+<div class="wt-panel" style="max-width:600px;margin:0 auto">
+    <div class="wt-panel__header">
+        <h1 class="wt-panel__title"><i class="bi bi-shield-lock"
+                style="background:var(--accent-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent"></i>
+            {% trans "Password Generator" %}</h1>
+        <p class="wt-panel__subtitle">{% trans "Create strong and secure passwords instantly in your browser." %}</p>
+    </div>
+
+    <div class="wt-form-group">
+        <div style="position: relative;">
+            <input type="text" id="passwordOutput" class="wt-input" readonly
+                style="font-size: 1.5rem; text-align: center; letter-spacing: 2px; padding-right: 50px;">
+            <button class="wt-btn wt-btn--secondary wt-btn--sm" id="copyBtn"
+                style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%);" title="Copy">
+                <i class="bi bi-clipboard"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="wt-form-group mt-lg">
+        <label class="wt-label" for="lengthRange">{% trans "Password Length" %}: <span id="lengthVal">16</span></label>
+        <input type="range" id="lengthRange" min="8" max="24" value="16" style="width: 100%;">
+    </div>
+
+    <div class="mt-md" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="checkbox" id="incUppercase" checked> {% trans "Uppercase letters" %} (A-Z)
+        </label>
+        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="checkbox" id="incLowercase" checked> {% trans "Lowercase letters" %} (a-z)
+        </label>
+        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="checkbox" id="incNumbers" checked> {% trans "Numbers" %} (0-9)
+        </label>
+        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="checkbox" id="incSymbols" checked> {% trans "Symbols" %} (!@#$%)
+        </label>
+    </div>
+
+    <button type="button" class="wt-btn wt-btn--primary wt-btn--block mt-lg" id="generateBtn">
+        <i class="bi bi-arrow-clockwise"></i> {% trans "Generate Password" %}
+    </button>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const passOut = document.getElementById('passwordOutput');
+    const lenRange = document.getElementById('lengthRange');
+    const lenVal = document.getElementById('lengthVal');
+    const chkUp = document.getElementById('incUppercase');
+    const chkLow = document.getElementById('incLowercase');
+    const chkNum = document.getElementById('incNumbers');
+    const chkSym = document.getElementById('incSymbols');
+    const genBtn = document.getElementById('generateBtn');
+    const copyBtn = document.getElementById('copyBtn');
+
+    const uppers = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const lowers = "abcdefghijklmnopqrstuvwxyz";
+    const numbers = "0123456789";
+    const symbols = "!@#$%^&*()_+~`|}{[]:;?><,./-=";
+
+    function generate() {
+        let chars = "";
+        if (chkUp.checked) chars += uppers;
+        if (chkLow.checked) chars += lowers;
+        if (chkNum.checked) chars += numbers;
+        if (chkSym.checked) chars += symbols;
+
+        if (chars === "") {
+            passOut.value = "{% trans 'Select at least one option!' %}";
+            return;
+        }
+
+        let password = "";
+        const length = parseInt(lenRange.value);
+        for (let i = 0; i < length; i++) {
+            password += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        passOut.value = password;
+    }
+
+    lenRange.addEventListener('input', () => {
+        lenVal.textContent = lenRange.value;
+        generate();
+    });
+
+    [chkUp, chkLow, chkNum, chkSym].forEach(chk => chk.addEventListener('change', generate));
+    genBtn.addEventListener('click', generate);
+
+    copyBtn.addEventListener('click', () => {
+        if (!passOut.value || passOut.value.includes('Select')) return;
+        navigator.clipboard.writeText(passOut.value).then(() => {
+            const icon = copyBtn.querySelector('i');
+            icon.className = 'bi bi-check2';
+            Toast.show('{% trans "Password copied!" %}', 'success');
+            setTimeout(() => icon.className = 'bi bi-clipboard', 2000);
+        });
+    });
+
+    // Generate initial
+    generate();
+</script>
+{% endblock %}

@@ -1,0 +1,92 @@
+{% extends 'base/layouts/main.html' %}
+{% load i18n %}
+
+{% block meta_title %}{% trans "Lorem Ipsum Generator" %} — WebTools{% endblock %}
+{% block meta_description %}{% trans "Generate random Lorem Ipsum placeholder text for web design and development." %}{% endblock %}
+
+{% block content %}
+<nav class="wt-breadcrumb" aria-label="Breadcrumb">
+    <a href="{% url 'home' %}">{% trans "Home" %}</a>
+    <span class="wt-breadcrumb__sep"><i class="bi bi-chevron-right"></i></span>
+    <span>{% trans "Lorem Ipsum Generator" %}</span>
+</nav>
+
+<div class="wt-panel" style="max-width:800px;margin:0 auto">
+    <div class="wt-panel__header">
+        <h1 class="wt-panel__title"><i class="bi bi-text-paragraph"
+                style="background:var(--accent-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent"></i>
+            {% trans "Lorem Ipsum Generator" %}</h1>
+        <p class="wt-panel__subtitle">{% trans "Generate dummy text for your mockups and prototypes instantly." %}</p>
+    </div>
+
+    <div class="wt-form-group" style="display:flex; gap:15px; align-items:flex-end;">
+        <div style="flex:1">
+            <label class="wt-label" for="count">{% trans "Paragraph Count" %}</label>
+            <input type="number" id="count" class="wt-input" min="1" max="100" value="3">
+        </div>
+        <div>
+            <button type="button" class="wt-btn wt-btn--primary" id="generateBtn">
+                <i class="bi bi-magic"></i> {% trans "Generate Text" %}
+            </button>
+            <button class="wt-btn wt-btn--secondary" id="copyBtn" title="Copy">
+                <i class="bi bi-clipboard"></i> {% trans "Copy All" %}
+            </button>
+        </div>
+    </div>
+
+    <div class="wt-form-group mt-lg">
+        <label class="wt-label">{% trans "Generated Placeholder" %}</label>
+        <textarea id="output" class="wt-input"
+            style="height: 400px; font-family: serif; font-size: 1.1rem; line-height: 1.6;" readonly></textarea>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const loremBase = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat nisl ut dapibus. Mauris iaculis porttitor posuere. Praesent id metus massa, ut blandit odio. Proin quis tortor orci. Etiam at risus et justo dignissim congue. Donec congue lacinia dui, a porttitor lectus condimentum laoreet. Nunc eu ullamcorper orci. Quisque eget odio ac lectus vestibulum faucibus eget in metus. In pellentesque faucibus vestibulum. Nulla at nulla justo, eget luctus tortor. Nulla facilisi. Duis aliquet egestas purus in blandit. Curabitur vulputate, ligula lacinia scelerisque tempor, lacus lacus ornare ante, ac egestas est urna sit amet arcu. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.";
+
+    const btn = document.getElementById('generateBtn');
+    const countIn = document.getElementById('count');
+    const out = document.getElementById('output');
+    const copy = document.getElementById('copyBtn');
+
+    function breakSentences() {
+        return loremBase.split('. ').map(s => s.trim() + (s.endsWith('.') ? '' : '. '));
+    }
+
+    btn.addEventListener('click', () => {
+        let count = parseInt(countIn.value);
+        if (isNaN(count) || count < 1) count = 1;
+
+        const sents = breakSentences();
+        let html = "";
+
+        for (let i = 0; i < count; i++) {
+            let pLength = Math.floor(Math.random() * 5) + 3; // 3 to 7 sentences per paragraph
+            let paragraph = "";
+            for (let j = 0; j < pLength; j++) {
+                paragraph += sents[Math.floor(Math.random() * sents.length)] + " ";
+            }
+            if (i === 0 && paragraph.indexOf('Lorem ipsum') !== 0) {
+                paragraph = "Lorem ipsum dolor sit amet, " + paragraph.toLowerCase();
+            }
+            html += paragraph.trim() + "\n\n";
+        }
+
+        out.value = html.trim();
+    });
+
+    copy.addEventListener('click', () => {
+        if (!out.value) return;
+        navigator.clipboard.writeText(out.value).then(() => {
+            const icon = copy.querySelector('i');
+            icon.className = 'bi bi-check2';
+            Toast.show('{% trans "Copied!" %}', 'success');
+            setTimeout(() => icon.className = 'bi bi-clipboard', 2000);
+        });
+    });
+
+    btn.click();
+</script>
+{% endblock %}

@@ -1,0 +1,93 @@
+{% extends 'base/layouts/main.html' %}
+{% load i18n static %}
+
+{% block meta_title %}{% trans "Video to Audio (MP4 to MP3)" %} — WebTools{% endblock %}
+{% block meta_description %}{% trans "Extract high-quality audio from your video files. Convert MP4, AVI, MKV to MP3 online for free." %}{% endblock %}
+
+{% block content %}
+<nav class="wt-breadcrumb" aria-label="Breadcrumb">
+    <a href="{% url 'home' %}">{% trans "Home" %}</a>
+    <span class="wt-breadcrumb__sep"><i class="bi bi-chevron-right"></i></span>
+    <span>{% trans "Video to Audio" %}</span>
+</nav>
+
+<div class="wt-panel" style="max-width:800px;margin:0 auto">
+    <div class="wt-panel__header">
+        <h1 class="wt-panel__title"><i class="bi bi-file-earmark-music"
+                style="background:var(--accent-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent"></i>
+            {% trans "Video to Audio Converter" %}</h1>
+        <p class="wt-panel__subtitle">{% trans "Extract an MP3 audio track from your video files instantly." %}</p>
+    </div>
+
+    {% if error %}
+    <div class="wt-alert wt-alert--error"><i class="bi bi-exclamation-circle"></i> {{ error }}</div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" id="videoForm">
+        {% csrf_token %}
+
+        <div class="wt-dropzone" id="dropzone">
+            <div class="wt-dropzone__icon"><i class="bi bi-file-earmark-play"></i></div>
+            <p class="wt-dropzone__text"><strong>{% trans "Click or drag" %}</strong> {% trans "to upload a Video" %}</p>
+            <p class="wt-dropzone__hint">{% trans "MP4, AVI, MKV, MOV (Max 200MB)" %}</p>
+            <input type="file" name="video_file" accept="video/mp4,video/x-msvideo,video/quicktime,video/x-matroska" required id="videoInput">
+        </div>
+
+        <div id="fileInfo" class="hidden mt-lg">
+            <ul class="wt-file-list" id="fileList"></ul>
+        </div>
+
+        <button type="submit" class="wt-btn wt-btn--primary wt-btn--block mt-lg" id="submitBtn" disabled>
+            <i class="bi bi-music-note-beamed"></i> {% trans "Extract Audio as MP3" %}
+        </button>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    (function () {
+        const dropzone = document.getElementById('dropzone');
+        const videoInput = document.getElementById('videoInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileList = document.getElementById('fileList');
+        const submitBtn = document.getElementById('submitBtn');
+
+        new DragDropUpload(dropzone, {
+            accept: 'video/*',
+            maxSize: 200 * 1024 * 1024,
+            onFilesAdded(files) {
+                if (files.length) {
+                    const dt = new DataTransfer();
+                    dt.items.add(files[0]);
+                    videoInput.files = dt.files;
+                    showFile(files[0]);
+                    submitBtn.disabled = false;
+                }
+            }
+        });
+
+        function showFile(file) {
+            fileInfo.classList.remove('hidden');
+            fileList.innerHTML = `
+            <li class="wt-file-item">
+                <span class="wt-file-item__icon"><i class="bi bi-file-earmark-play-fill"></i></span>
+                <div class="wt-file-item__info">
+                    <div class="wt-file-item__name">${file.name}</div>
+                    <div class="wt-file-item__size">${formatSize(file.size)}</div>
+                </div>
+            </li>
+            `;
+        }
+
+        document.getElementById('videoForm').addEventListener('submit', function() {
+            submitBtn.innerHTML = '<div class="wt-spinner wt-spinner--sm" style="margin-right:8px"></div> {% trans "Extracting Audio..." %}';
+            submitBtn.disabled = true;
+            setTimeout(() => {
+                submitBtn.innerHTML = '<i class="bi bi-music-note-beamed"></i> {% trans "Extract Audio as MP3" %}';
+                submitBtn.disabled = false;
+            }, 5000);
+        });
+    })();
+</script>
+{% endblock %}

@@ -54,6 +54,11 @@ INSTALLED_APPS = [
     'apps.ads',
     'apps.deploy',
     'apps.domains',
+    'apps.video_to_audio',
+    'apps.password_generator',
+    'apps.text_diff',
+    'apps.lorem_ipsum',
+    'apps.tool_manager',
 ]
 
 MIDDLEWARE = [
