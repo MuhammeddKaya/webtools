@@ -10,6 +10,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     ffmpeg \
     gettext \
+    certbot \
+    docker.io \
     && rm -rf /var/lib/apt/lists/*
 
 # Python dependencies
