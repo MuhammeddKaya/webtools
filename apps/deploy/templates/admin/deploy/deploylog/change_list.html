@@ -1,0 +1,24 @@
+{% extends "admin/change_list.html" %}
+{% load i18n %}
+
+{% block content %}
+{% if show_deploy_button %}
+<div
+    style="background:#1a252f;border:1px solid #2d3e50;border-radius:8px;padding:20px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between">
+    <div>
+        <h3 style="margin:0 0 4px;color:#e0e0e0">🚀 Git Deploy</h3>
+        <p style="margin:0;color:#8899aa;font-size:13px">Git'ten son değişiklikleri çek, migration ve static dosyaları
+            güncelle.</p>
+    </div>
+    <form method="post" action="{% url 'admin:deploy-now' %}" style="margin:0">
+        {% csrf_token %}
+        <button type="submit"
+            style="background:#28a745;color:#fff;border:none;padding:10px 24px;border-radius:6px;cursor:pointer;font-size:14px;font-weight:600"
+            onclick="return confirm('Git pull ve migrate çalıştırılacak. Devam?')">
+            ⬇️ Deploy Now
+        </button>
+    </form>
+</div>
+{% endif %}
+{{ block.super }}
+{% endblock %}

@@ -1,0 +1,56 @@
+services:
+  web:
+    build: .
+    container_name: webtools-app
+    restart: always
+    volumes:
+      - .:/app
+      - static_data:/app/staticfiles
+      - media_data:/app/media
+      - db_data:/app/db
+    env_file:
+      - .env
+    depends_on:
+      - db
+    networks:
+      - webtools-net
+
+  db:
+    image: postgres:16-alpine
+    container_name: webtools-db
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: ${DB_NAME:-webtools}
+      POSTGRES_USER: ${DB_USER:-webtools}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme123}
+    networks:
+      - webtools-net
+
+  nginx:
+    image: nginx:alpine
+    container_name: webtools-nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - static_data:/app/staticfiles:ro
+      - media_data:/app/media:ro
+      - ./nginx/certs:/etc/nginx/certs:ro
+    depends_on:
+      - web
+    networks:
+      - webtools-net
+
+volumes:
+  postgres_data:
+  static_data:
+  media_data:
+  db_data:
+
+networks:
+  webtools-net:
+    driver: bridge

@@ -1,0 +1,13 @@
+# requirements.txt — WebTools
+Django==5.2.8
+gunicorn==23.0.0
+psycopg2-binary==2.9.10
+Pillow==12.0.0
+PyMuPDF==1.26.6
+pypdf==6.3.0
+python-pptx==1.0.2
+qrcode==8.2
+rembg==2.0.68
+SpeechRecognition==3.14.4
+pydub==0.25.1
+Babel==2.10.3
