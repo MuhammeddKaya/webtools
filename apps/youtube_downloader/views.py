@@ -38,6 +38,8 @@ def index(request):
             "noplaylist": True,
             "quiet": True,
             "restrictfilenames": True,
+            "js_runtimes": {"nodejs": {}, "node": {}, "deno": {}},
+            "extractor_args": {"youtube": {"player-client": ["web", "default"]}},
         }
 
         if fmt == "mp3":
@@ -88,9 +90,11 @@ def index(request):
             threading.Thread(target=cleanup, daemon=True).start()
 
             return response
-        except Exception:
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
             context["error"] = _(
-                "İndirme sırasında bir hata oluştu. Lütfen bağlantıyı kontrol edin veya daha sonra tekrar deneyin."
+                f"İndirme sırasında bir hata oluştu: {str(e)}. Lütfen bağlantıyı kontrol edin veya daha sonra tekrar deneyin."
             )
 
     return render(request, "youtube_downloader/index.html", context)

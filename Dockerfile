@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gettext \
     certbot \
     docker.io \
+    nodejs \
     && rm -rf /var/lib/apt/lists/*
 
 # Python dependencies
