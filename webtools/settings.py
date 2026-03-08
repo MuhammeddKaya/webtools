@@ -60,6 +60,8 @@ INSTALLED_APPS = [
     'apps.lorem_ipsum',
     'apps.tool_manager',
     'apps.youtube_downloader',
+    'apps.analytics',
+    'apps.pages',
 ]
 
 MIDDLEWARE = [
@@ -71,6 +73,7 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'apps.analytics.middleware.VisitStatsMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
@@ -87,6 +90,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.i18n',
+                'apps.pages.context_processors.static_pages',
             ],
         },
     },

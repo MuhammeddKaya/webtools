@@ -1,0 +1,25 @@
+{% extends 'base/layouts/main.html' %}
+{% load i18n %}
+
+{% block meta_title %}{{ page.title }} — WebTools{% endblock %}
+{% block meta_description %}{{ page.title }} — WebTools{% endblock %}
+
+{% block content %}
+<nav class="wt-breadcrumb" aria-label="Breadcrumb">
+    <a href="{% url 'home' %}">{% trans "Home" %}</a>
+    <span class="wt-breadcrumb__sep"><i class="bi bi-chevron-right"></i></span>
+    <span>{{ page.title }}</span>
+</nav>
+
+<div class="wt-panel" style="max-width:800px;margin:0 auto">
+    <div class="wt-panel__header">
+        <h1 class="wt-panel__title">{{ page.title }}</h1>
+    </div>
+
+    <div class="wt-panel__body">
+        {# Allow simple HTML in content if you add it from admin #}
+        {{ page.content|linebreaksbr }}
+    </div>
+</div>
+{% endblock %}
+

@@ -70,6 +70,13 @@
                         <i class="bi bi-house"></i> {% trans "Home" %}
                     </a>
                 </li>
+                {% for page in nav_static_pages %}
+                <li>
+                    <a href="{% url 'pages:detail' slug=page.slug %}" class="wt-navbar__link">
+                        {{ page.title }}
+                    </a>
+                </li>
+                {% endfor %}
                 <li class="wt-lang-dropdown">
                     <button class="wt-navbar__link" aria-haspopup="true">
                         <i class="bi bi-globe2"></i> {% trans "Language" %}
@@ -145,6 +152,11 @@
                 <li><a href="{% url 'image_resize:index' %}">{% trans "Image Resize" %}</a></li>
                 <li><a href="{% url 'qr_generator:index' %}">{% trans "QR Generator" %}</a></li>
                 <li><a href="{% url 'word_counter:index' %}">{% trans "Word Counter" %}</a></li>
+            </ul>
+            <ul class="wt-footer__links" aria-label="{% trans 'Site links' %}">
+                {% for page in footer_static_pages %}
+                <li><a href="{% url 'pages:detail' slug=page.slug %}">{{ page.title }}</a></li>
+                {% endfor %}
             </ul>
             <p>&copy; 2026 WebTools — {% trans "Free online tools for everyone." %}</p>
         </div>

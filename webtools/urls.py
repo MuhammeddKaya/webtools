@@ -29,6 +29,7 @@ urlpatterns += i18n_patterns(
     path('password-generator/', include('apps.password_generator.urls')),
     path('text-diff/', include('apps.text_diff.urls')),
     path('lorem-ipsum/', include('apps.lorem_ipsum.urls')),
+    path('pages/', include('apps.pages.urls')),
 )
 
 if settings.DEBUG:
