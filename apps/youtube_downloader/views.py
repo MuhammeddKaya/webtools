@@ -42,6 +42,18 @@ def index(request):
             "extractor_args": {"youtube": {"player-client": ["web", "default"]}},
         }
 
+        cookies_from_browser = getattr(settings, "YT_COOKIES_FROM_BROWSER", "").strip()
+        cookies_browser_profile = getattr(settings, "YT_COOKIES_BROWSER_PROFILE", "").strip()
+        cookies_file = getattr(settings, "YT_COOKIES_FILE", "")
+
+        if cookies_from_browser:
+            if cookies_browser_profile:
+                ydl_opts["cookiesfrombrowser"] = (cookies_from_browser, cookies_browser_profile)
+            else:
+                ydl_opts["cookiesfrombrowser"] = (cookies_from_browser,)
+        elif cookies_file and os.path.isfile(cookies_file):
+            ydl_opts["cookiefile"] = cookies_file
+
         if fmt == "mp3":
             ydl_opts.update(
                 {

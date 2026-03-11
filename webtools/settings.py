@@ -159,6 +159,13 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # ============================================
+# YouTube Downloader
+# ============================================
+YT_COOKIES_FILE = os.environ.get('YT_COOKIES_FILE', str(BASE_DIR / 'yt_cookies.txt'))
+YT_COOKIES_FROM_BROWSER = os.environ.get('YT_COOKIES_FROM_BROWSER', '').strip()
+YT_COOKIES_BROWSER_PROFILE = os.environ.get('YT_COOKIES_BROWSER_PROFILE', '').strip()
+
+# ============================================
 # Default primary key field type
 # ============================================
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
